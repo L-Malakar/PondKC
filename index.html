@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pond Ecosystem — Karimganj College</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep: #0a1628;
+    --pond: #0d3b5e;
+    --teal: #0e7490;
+    --aqua: #22d3ee;
+    --foam: #cffafe;
+    --leaf: #16a34a;
+    --moss: #4ade80;
+    --gold: #f59e0b;
+    --cream: #fef3c7;
+    --sand: #d4a574;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep);
+    color: var(--foam);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--aqua);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--aqua);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+    opacity: 0.5;
+  }
+
+  /* ===== HERO ===== */
+  #hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .college-badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--aqua);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+    opacity: 0;
+    animation: fadeUp 1s 0.6s forwards;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--aqua);
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+  }
+
+  .hero-subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--sand);
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.9s forwards;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 1.5s forwards;
+    z-index: 10;
+  }
+  .scroll-cue span {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--aqua);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--aqua), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(10,22,40,0.9), transparent);
+    backdrop-filter: blur(2px);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: var(--aqua);
+    font-style: italic;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(207,250,254,0.6);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--aqua); }
+
+  /* ===== SECTIONS ===== */
+  section {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--aqua);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+
+  .section-body {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: rgba(207,250,254,0.8);
+    max-width: 680px;
+  }
+
+  /* ===== INTRO SECTION ===== */
+  #intro {
+    background: linear-gradient(180deg, var(--deep) 0%, #061529 100%);
+  }
+  #intro::before {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(14,116,144,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  /* ===== RIPPLE DIVIDER ===== */
+  .ripple-divider {
+    width: 100%;
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ripple-divider svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== ABIOTIC SECTION ===== */
+  #abiotic {
+    background: linear-gradient(180deg, #061529 0%, #0a2240 100%);
+  }
+
+  .factors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .factor-card {
+    background: rgba(13,59,94,0.4);
+    border: 1px solid rgba(34,211,238,0.15);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    cursor: default;
+  }
+  .factor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--aqua), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+  }
+  .factor-card:hover { 
+    transform: translateY(-6px);
+    border-color: rgba(34,211,238,0.4);
+    background: rgba(13,59,94,0.7);
+  }
+  .factor-card:hover::before { transform: scaleX(1); }
+
+  .factor-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .factor-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--foam);
+    margin-bottom: 0.5rem;
+  }
+  .factor-desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: rgba(207,250,254,0.65);
+  }
+
+  /* ===== BIOTIC SECTION ===== */
+  #biotic {
+    background: linear-gradient(180deg, #0a2240 0%, #061520 100%);
+  }
+
+  .chain-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 4rem 0;
+  }
+
+  .chain-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .chain-circle {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .chain-circle:hover { transform: scale(1.12); }
+
+  .chain-circle.producer { border-color: var(--moss); background: rgba(22,163,74,0.15); }
+  .chain-circle.primary { border-color: var(--aqua); background: rgba(14,116,144,0.15); }
+  .chain-circle.secondary { border-color: var(--gold); background: rgba(245,158,11,0.15); }
+  .chain-circle.tertiary { border-color: #f87171; background: rgba(239,68,68,0.15); }
+  .chain-circle.decomposer { border-color: var(--sand); background: rgba(212,165,116,0.15); }
+
+  .chain-emoji { font-size: 2rem; }
+  .chain-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+    opacity: 0.7;
+  }
+  .chain-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    margin-top: 0.75rem;
+    color: rgba(207,250,254,0.7);
+  }
+
+  .chain-arrow {
+    font-size: 1.5rem;
+    color: rgba(34,211,238,0.4);
+    padding: 0 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  /* ===== PRODUCERS TABLE ===== */
+  #producers {
+    background: linear-gradient(180deg, #061520 0%, #071c30 100%);
+  }
+
+  .table-wrap {
+    margin-top: 3rem;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(34,211,238,0.2);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: rgba(14,116,144,0.4);
+  }
+  th {
+    padding: 1.2rem 1.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--aqua);
+    text-align: left;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(34,211,238,0.08);
+    transition: background 0.3s;
+  }
+  tbody tr:hover { background: rgba(14,116,144,0.15); }
+  td {
+    padding: 1.1rem 1.5rem;
+    font-size: 0.9rem;
+    color: rgba(207,250,254,0.8);
+  }
+  td:nth-child(3) {
+    font-style: italic;
+    color: var(--moss);
+    font-size: 0.85rem;
+  }
+  td:nth-child(1) {
+    color: rgba(207,250,254,0.4);
+    font-size: 0.8rem;
+  }
+
+  /* ===== FISH SECTION ===== */
+  #fish {
+    background: linear-gradient(180deg, #071c30 0%, #0a1628 100%);
+  }
+
+  .fish-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .fish-card {
+    background: rgba(10,34,64,0.5);
+    border: 1px solid rgba(34,211,238,0.1);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .fish-card:hover {
+    border-color: rgba(34,211,238,0.35);
+    background: rgba(14,59,94,0.6);
+    transform: translateY(-4px);
+  }
+  .fish-common {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--foam);
+    margin-bottom: 0.3rem;
+  }
+  .fish-sci {
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--moss);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+  .fish-status {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    background: rgba(34,211,238,0.1);
+    color: var(--aqua);
+    border: 1px solid rgba(34,211,238,0.2);
+  }
+  .fish-status.en {
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border-color: rgba(239,68,68,0.2);
+  }
+  .fish-status.u {
+    background: rgba(245,158,11,0.1);
+    color: var(--gold);
+    border-color: rgba(245,158,11,0.2);
+  }
+
+  /* ===== FOOD WEB ===== */
+  #foodweb {
+    background: linear-gradient(180deg, #0a1628 0%, #061529 100%);
+  }
+
+  .web-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    margin-top: 3rem;
+  }
+
+  .web-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: default;
+  }
+
+  .web-bubble {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border: 1.5px solid;
+  }
+  .web-bubble:hover { transform: scale(1.2); }
+
+  .web-bubble.phyto { background: rgba(22,163,74,0.25); border-color: var(--moss); color: var(--moss); }
+  .web-bubble.bacteria { background: rgba(245,158,11,0.25); border-color: var(--gold); color: var(--gold); }
+  .web-bubble.zoo { background: rgba(14,116,144,0.25); border-color: var(--aqua); color: var(--aqua); }
+  .web-bubble.protozoa { background: rgba(168,85,247,0.25); border-color: #c084fc; color: #c084fc; }
+  .web-bubble.detritus { background: rgba(212,165,116,0.25); border-color: var(--sand); color: var(--sand); }
+  .web-bubble.doc { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
+  .web-bubble.virus { background: rgba(239,68,68,0.2); border-color: #f87171; color: #f87171; }
+
+  .web-label {
+    font-size: 0.6rem;
+    margin-top: 0.4rem;
+    color: rgba(207,250,254,0.5);
+    max-width: 90px;
+    line-height: 1.3;
+  }
+
+  /* ===== CONCLUSION ===== */
+  #conclusion {
+    background: linear-gradient(180deg, #061529 0%, #0a1628 100%);
+    text-align: center;
+  }
+
+  #conclusion .section-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .quote-block {
+    max-width: 750px;
+    margin: 3rem auto;
+    padding: 3rem;
+    background: rgba(13,59,94,0.3);
+    border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 24px;
+    position: relative;
+  }
+  .quote-block::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    color: rgba(34,211,238,0.1);
+    position: absolute;
+    top: -1rem;
+    left: 1.5rem;
+    line-height: 1;
+  }
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--foam);
+  }
+
+  .meta-strip {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(34,211,238,0.1);
+  }
+  .meta-item {
+    text-align: center;
+  }
+  .meta-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--aqua);
+    margin-bottom: 0.4rem;
+  }
+  .meta-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--foam);
+  }
+
+  /* ===== RATING BADGE ===== */
+  .rating-badge {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+    background: rgba(10,22,40,0.9);
+    border: 1px solid rgba(34,211,238,0.3);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 1s 2s forwards;
+  }
+  .rating-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--aqua);
+    line-height: 1;
+  }
+  .rating-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(207,250,254,0.5);
+  }
+  .rating-stars {
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== DECORATIVE ELEMENTS ===== */
+  .deco-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--aqua), transparent);
+    margin-bottom: 1.5rem;
+  }
+
+  .float-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(34,211,238,0.15), rgba(34,211,238,0.03));
+    border: 1px solid rgba(34,211,238,0.08);
+    animation: float linear infinite;
+    pointer-events: none;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.3; transform: scaleY(0.5); }
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    5% { opacity: 1; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+  }
+
+  @keyframes ripple {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+
+  @keyframes waveMove {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== WATER SURFACE ANIMATION ===== */
+  .water-surface {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    overflow: hidden;
+    opacity: 0.3;
+  }
+  .water-surface svg {
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    animation: waveMove 8s linear infinite;
+  }
+
+  /* Fish swimming decoration */
+  .swimming-fish {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: swimAcross 20s linear infinite;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  @keyframes swimAcross {
+    0% { transform: translateX(-100px) translateY(0px); }
+    25% { transform: translateX(25vw) translateY(-20px); }
+    50% { transform: translateX(50vw) translateY(10px); }
+    75% { transform: translateX(75vw) translateY(-15px); }
+    100% { transform: translateX(calc(100vw + 100px)) translateY(5px); }
+  }
+
+  /* ===== SCROLL PROGRESS ===== */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--aqua), var(--moss));
+    z-index: 1001;
+    transition: width 0.1s;
+  }
+
+  /* Particle dots for background */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--aqua);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFade linear infinite;
+  }
+  @keyframes particleFade {
+    0% { opacity: 0; transform: translateY(0); }
+    20% { opacity: 0.4; }
+    80% { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-100px); }
+  }
+
+  .highlight {
+    color: var(--aqua);
+    font-style: italic;
+  }
+
+  .handwritten {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    color: var(--sand);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo">Pond Ecosystem Study</div>
+  <ul class="nav-links">
+    <li><a href="#intro">Intro</a></li>
+    <li><a href="#abiotic">Abiotic</a></li>
+    <li><a href="#biotic">Biotic</a></li>
+    <li><a href="#producers">Producers</a></li>
+    <li><a href="#fish">Fish Species</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas class="hero-canvas" id="pondCanvas"></canvas>
+  
+  <div class="hero-content">
+    <div class="college-badge">Karimganj College · Dept. of Ecology & Environmental Science</div>
+    <h1 class="hero-title">
+      Study of
+      <span>Pond Ecosystem</span>
+    </h1>
+    <div class="hero-subtitle">College Pond · Environmental Science · H.S. First Year</div>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Dive In</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Introduction</div>
+      <h2 class="section-title">A Living<br><span class="highlight">Freshwater World</span></h2>
+    </div>
+    <div class="reveal" style="transition-delay: 0.2s">
+      <p class="section-body">
+        The pond ecosystem is a <span class="highlight">freshwater environment</span> that can reveal the health of a local area. Like a mirror of nature, the pond ecosystem has specific life forms that show its overall health. Toxins or pollution can affect the pond ecosystem adversely.
+      </p>
+      <br>
+      <p class="section-body">
+        The pond ecosystem begins with what lives in water — from the smallest microbes, single-cell creatures, to the guppies, teachers and midges. Only clean water can sustain life. The plants that convert oxygen from these creatures are an important part of the fauna. A healthy pond ecosystem will have a <span class="highlight">balance of both plant and animal life</span> living within its parameters.
+      </p>
+    </div>
+
+    <!-- Info cards -->
+    <div class="factors-grid reveal" style="transition-delay: 0.4s; margin-top: 3rem; grid-template-columns: repeat(3, 1fr);">
+      <div class="factor-card">
+        <div class="factor-icon">⚖️</div>
+        <div class="factor-name">Balance</div>
+        <div class="factor-desc">A healthy pond maintains equilibrium between producers, consumers, and decomposers in a continuous cycle.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🔬</div>
+        <div class="factor-name">Indicators</div>
+        <div class="factor-desc">Pond species act as bioindicators — their presence or absence tells us about environmental quality.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🌊</div>
+        <div class="factor-name">Cascade Effect</div>
+        <div class="factor-desc">Loss of one species triggers ripple effects through the food chain, threatening the entire ecosystem.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating bubbles decoration -->
+  <div class="float-bubble" style="width:300px;height:300px;right:-50px;top:10%;opacity:0.5;"></div>
+  <div class="float-bubble" style="width:150px;height:150px;left:5%;bottom:20%;opacity:0.3;"></div>
+</section>
+
+<!-- STUDY AREA -->
+<div class="ripple-divider">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,30 1440,60 L1440,120 L0,120 Z" fill="rgba(10,34,64,0.5)"/>
+    <path d="M0,80 C240,40 480,100 720,70 C960,40 1200,90 1440,60 L1440,120 L0,120 Z" fill="rgba(13,59,94,0.3)"/>
+  </svg>
+</div>
+
+<!-- ABIOTIC -->
+<section id="abiotic">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Observations</div>
+      <h2 class="section-title">Abiotic<br><span class="highlight">Components</span></h2>
+      <p class="section-body">
+        Abiotic factors are the non-living factors that can have an impact on the ecosystem. These shape the physical environment in which all living organisms must survive.
+      </p>
+    </div>
+
+    <div class="factors-grid reveal" style="transition-delay: 0.3s">
+      <div class="factor-card">
+        <div class="factor-icon">💧</div>
+        <div class="factor-name">Water Quality</div>
+        <div class="factor-desc">The quantity of water is crucial for living organisms in the pond. Only clean water can sustain life in the ecosystem.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🌡️</div>
+        <div class="factor-name">Temperature</div>
+        <div class="factor-desc">Extremes impact oxygen levels. Too hot — fish struggle to breathe. Too cold — ice forms, blocking sunlight and O₂.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">☀️</div>
+        <div class="factor-name">Light</div>
+        <div class="factor-desc">Plants need sunlight for photosynthesis, producing oxygen not just above but below the water surface for aquatic life.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🧪</div>
+        <div class="factor-name">pH Level</div>
+        <div class="factor-desc">Too low or too high acidity in the water can clog a fish's gills and make reproduction more challenging.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🌱</div>
+        <div class="factor-name">Soil</div>
+        <div class="factor-desc">The soil needs to contain enough moisture to keep surrounding plants alive. Moist, fertile soil helps plants thrive.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🍂</div>
+        <div class="factor-name">Seasonal Change</div>
+        <div class="factor-desc">Spring and fall are the seasons that keep the ecosystem healthy and minimize negative effects on organisms.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BIOTIC -->
+<section id="biotic">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Biotic Factors</div>
+      <h2 class="section-title">The Living<br><span class="highlight">Community</span></h2>
+      <p class="section-body">
+        Biotic factors relate to all the living things in the ecosystem. Their presence and biological by-products affect the composition of an ecosystem — from animals and humans, to plants, fungi and bacteria.
+      </p>
+    </div>
+
+    <!-- Food Chain -->
+    <div class="reveal" style="transition-delay: 0.3s">
+      <h3 style="font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--aqua); margin-top:3rem; margin-bottom:0.5rem; text-align:center;">The Pond Food Chain</h3>
+      <p style="text-align:center; font-size:0.8rem; color:rgba(207,250,254,0.5); margin-bottom:0;">Energy flows through trophic levels</p>
+    </div>
+
+    <div class="chain-visual reveal" style="transition-delay: 0.5s">
+      <div class="chain-node">
+        <div class="chain-circle producer">
+          <span class="chain-emoji">🌿</span>
+          <span class="chain-label">Producers</span>
+        </div>
+        <div class="chain-name">Phytoplankton<br>& Aquatic Plants</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-circle primary">
+          <span class="chain-emoji">🦐</span>
+          <span class="chain-label">Primary</span>
+        </div>
+        <div class="chain-name">Zooplankton</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-circle secondary">
+          <span class="chain-emoji">🐟</span>
+          <span class="chain-label">Secondary</span>
+        </div>
+        <div class="chain-name">Fish</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-circle tertiary">
+          <span class="chain-emoji">🐢</span>
+          <span class="chain-label">Tertiary</span>
+        </div>
+        <div class="chain-name">Turtle</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node">
+        <div class="chain-circle decomposer">
+          <span class="chain-emoji">🦠</span>
+          <span class="chain-label">Decomposers</span>
+        </div>
+        <div class="chain-name">Bacteria &<br>Detritivores</div>
+      </div>
+    </div>
+
+    <!-- Decomposers explanation -->
+    <div class="reveal" style="transition-delay: 0.6s; margin-top: 2rem;">
+      <div class="factor-card" style="max-width:700px; margin:0 auto;">
+        <div class="factor-icon">♻️</div>
+        <div class="factor-name">Decomposers — Nature's Recyclers</div>
+        <div class="factor-desc" style="font-size:0.9rem; line-height:1.75;">
+          Animal waste, dead and decaying plants, and animal remains form detritus on the bottom of the pond. Decomposers — also known as detritivores — are bacteria and other organisms that break down detritus into material that can be used by primary producers. During decay, microbes living on detritus pull nutrients from the overlying water, improving water quality. In the process of breaking down detritus, decomposers produce water and carbon dioxide.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCERS -->
+<section id="producers">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Flora</div>
+      <h2 class="section-title">Producers of the<br><span class="highlight">Pond Ecosystem</span></h2>
+    </div>
+    <div class="table-wrap reveal" style="transition-delay: 0.3s">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Common Name</th>
+            <th>Scientific Name</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01</td>
+            <td>Water Thyme</td>
+            <td>Hydrilla</td>
+            <td>Submerged oxygenator</td>
+          </tr>
+          <tr>
+            <td>02</td>
+            <td>Pond Weed</td>
+            <td>Potamogeton</td>
+            <td>Habitat provider</td>
+          </tr>
+          <tr>
+            <td>03</td>
+            <td>Water Lettuce</td>
+            <td>Pistia</td>
+            <td>Floating shade cover</td>
+          </tr>
+          <tr>
+            <td>04</td>
+            <td>Spotless Watermeal</td>
+            <td>Wolffia</td>
+            <td>Micro floating plant</td>
+          </tr>
+          <tr>
+            <td>05</td>
+            <td>Duck Weed</td>
+            <td>Lemna</td>
+            <td>Surface coverage</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Visual plant illustrations -->
+    <div class="factors-grid reveal" style="transition-delay:0.5s; margin-top:2.5rem; grid-template-columns:repeat(5,1fr);">
+      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div style="font-size:3rem;">🌿</div>
+        <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Hydrilla</div>
+      </div>
+      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div style="font-size:3rem;">🪴</div>
+        <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Potamogeton</div>
+      </div>
+      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div style="font-size:3rem;">🥬</div>
+        <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Pistia</div>
+      </div>
+      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div style="font-size:3rem;">🌱</div>
+        <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Wolffia</div>
+      </div>
+      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div style="font-size:3rem;">🍃</div>
+        <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Lemna</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FISH SPECIES -->
+<section id="fish">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Fauna</div>
+      <h2 class="section-title">Fish Species<br><span class="highlight">of the Pond</span></h2>
+      <p class="section-body">15 fish species identified. Status codes: <span style="color:var(--aqua)">C = Common</span> · <span style="color:#fca5a5">EN = Endangered</span> · <span style="color:var(--gold)">U = Uncommon</span> · FF = Freshwater · PF = Predatory · WF = Wide-ranging</p>
+    </div>
+
+    <div class="fish-grid reveal" style="transition-delay:0.3s">
+      <div class="fish-card">
+        <div class="fish-common">Chital</div>
+        <div class="fish-sci">Notopterus chitala (Hamilton)</div>
+        <span class="fish-status">C, PF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Catla</div>
+        <div class="fish-sci">Catla catla (Hammitton)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Mrigal</div>
+        <div class="fish-sci">Cirrhinus mrigala (Hammitton)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Common Carp</div>
+        <div class="fish-sci">Cyprinus carpio (Linnaeus)</div>
+        <span class="fish-status en">En, PF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Stone Sucker</div>
+        <div class="fish-sci">Garra lamta (Hamilton)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Khavli Barb</div>
+        <div class="fish-sci">Putins dicto (Hamilton)</div>
+        <span class="fish-status">C, WF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Baal</div>
+        <div class="fish-sci">Wallago attu (Schneider)</div>
+        <span class="fish-status">C, PF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Magun</div>
+        <div class="fish-sci">Clarias batrachus (Linnaeus)</div>
+        <span class="fish-status en">EN, PF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Stinging Catfish</div>
+        <div class="fish-sci">Heteropneustes fossilis (Bloch)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Indian Glass Fish</div>
+        <div class="fish-sci">Chanda nanga (Hamilton)</div>
+        <span class="fish-status">C, WF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Spiny Eel</div>
+        <div class="fish-sci">Mastacembelus armatus (Lacepede)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Spotted Snakehead</div>
+        <div class="fish-sci">Ophiocephalus punctatus (Bloch)</div>
+        <span class="fish-status">C, PF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Climbing Perch</div>
+        <div class="fish-sci">Anabus testudineus (Bloch)</div>
+        <span class="fish-status">C, WF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Bar-eyed Goby</div>
+        <div class="fish-sci">Glossogobius giuris (Hamilton)</div>
+        <span class="fish-status u">U, FF</span>
+      </div>
+      <div class="fish-card">
+        <div class="fish-common">Mottled Nandus</div>
+        <div class="fish-sci">Nandus nandus (Hamilton)</div>
+        <span class="fish-status">C, FF</span>
+      </div>
+    </div>
+  </div>
+  <div class="swimming-fish" style="top:30%; animation-delay: -5s;">🐟</div>
+  <div class="swimming-fish" style="top:60%; font-size:1rem; animation-delay:-12s; animation-duration:25s;">🐠</div>
+</section>
+
+<!-- FOOD WEB -->
+<section id="foodweb">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line"></div>
+      <div class="section-label">Decomposer Network</div>
+      <h2 class="section-title">The Microbial<br><span class="highlight">Food Web</span></h2>
+      <p class="section-body">The decomposer food web illustrates how energy and nutrients cycle through the microscopic community of the pond — a hidden world that keeps the entire ecosystem functioning.</p>
+    </div>
+
+    <!-- Interactive SVG food web -->
+    <div class="reveal" style="transition-delay:0.3s; margin-top:3rem;">
+      <svg viewBox="0 0 800 480" width="100%" style="max-height:480px;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="rgba(34,211,238,0.5)"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Arrows -->
+        <line x1="180" y1="180" x2="390" y2="220" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="180" y1="180" x2="580" y2="100" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="390" y1="250" x2="580" y2="100" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="390" y1="250" x2="580" y2="380" stroke="rgba(245,158,11,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="390" y1="250" x2="200" y2="380" stroke="rgba(245,158,11,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="580" y1="420" x2="580" y2="150" stroke="rgba(34,211,238,0.2)" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+        <line x1="580" y1="420" x2="620" y2="260" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="650" y1="280" x2="650" y2="150" stroke="rgba(74,222,128,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <!-- Phytoplankton -->
+        <circle cx="160" cy="170" r="52" fill="rgba(22,163,74,0.2)" stroke="#4ade80" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="160" y="163" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600" letter-spacing="0.5">PHYTO</text>
+        <text x="160" y="178" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600">PLANKTON</text>
+        <text x="160" y="195" text-anchor="middle" fill="rgba(74,222,128,0.5)" font-size="9">🌿</text>
+
+        <!-- Bacteria -->
+        <circle cx="400" cy="235" r="55" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="400" y="230" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600" letter-spacing="0.5">BACTERIA</text>
+        <text x="400" y="248" text-anchor="middle" fill="rgba(245,158,11,0.5)" font-size="12">🦠</text>
+
+        <!-- Detritus -->
+        <circle cx="610" cy="110" r="50" fill="rgba(212,165,116,0.2)" stroke="#d4a574" stroke-width="1.5"/>
+        <text x="610" y="105" text-anchor="middle" fill="#d4a574" font-size="10" font-weight="600">DETRITUS</text>
+        <text x="610" y="122" text-anchor="middle" fill="rgba(212,165,116,0.5)" font-size="11">🍂</text>
+
+        <!-- Virus -->
+        <circle cx="400" cy="395" r="42" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="1.5"/>
+        <text x="400" y="390" text-anchor="middle" fill="#f87171" font-size="10" font-weight="600">VIRUS</text>
+        <text x="400" y="408" text-anchor="middle" fill="rgba(239,68,68,0.5)" font-size="10">⚗️</text>
+
+        <!-- DOC -->
+        <circle cx="170" cy="385" r="48" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+        <text x="170" y="375" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">DISSOLVED</text>
+        <text x="170" y="390" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">ORGANIC</text>
+        <text x="170" y="405" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">CARBON</text>
+
+        <!-- Zooplankton -->
+        <circle cx="660" cy="290" r="50" fill="rgba(14,116,144,0.2)" stroke="#22d3ee" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="660" y="283" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600" letter-spacing="0.5">ZOO</text>
+        <text x="660" y="297" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600">PLANKTON</text>
+        <text x="660" y="313" text-anchor="middle" fill="rgba(34,211,238,0.5)" font-size="11">🦐</text>
+
+        <!-- Protozoa -->
+        <circle cx="660" cy="420" r="44" fill="rgba(168,85,247,0.2)" stroke="#c084fc" stroke-width="1.5"/>
+        <text x="660" y="415" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">PROTOZOA</text>
+        <text x="660" y="432" text-anchor="middle" fill="rgba(192,132,252,0.5)" font-size="10">🔬</text>
+
+        <line x1="660" y1="375" x2="660" y2="340" stroke="rgba(168,85,247,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section id="conclusion">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="deco-line" style="margin:0 auto 1rem;"></div>
+      <div class="section-label">Conclusion</div>
+      <h2 class="section-title">What We<br><span class="highlight">Discovered</span></h2>
+    </div>
+
+    <div class="quote-block reveal" style="transition-delay:0.3s">
+      <p class="quote-text">
+        Ponds are greatly influenced by humans, even though we don't pay much attention to them — they seem very man-made and controlled with man-made water falls or species not native like koi. We found out that there are many paths to a pond, like niches, predators, prey, toxic waste, and more — and they can all be affected by us taking action.
+      </p>
+    </div>
+
+    <div class="meta-strip reveal" style="transition-delay:0.5s">
+      <div class="meta-item">
+        <div class="meta-label">Student</div>
+        <div class="meta-value">Lalmohan Malakar</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Class</div>
+        <div class="meta-value">H.S. First Year</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Roll No</div>
+        <div class="meta-value">314</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Subject</div>
+        <div class="meta-value">Environmental Science</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Submitted To</div>
+        <div class="meta-value">Dr. Malabika Bhattacharjee</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Date</div>
+        <div class="meta-value">26.03.26</div>
+      </div>
+    </div>
+
+    <!-- Key stats -->
+    <div class="factors-grid reveal" style="transition-delay:0.7s; margin-top:3rem; grid-template-columns:repeat(4,1fr);">
+      <div class="factor-card" style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--aqua); font-weight:900;">5</div>
+        <div class="factor-name" style="font-size:0.85rem;">Aquatic Producers</div>
+      </div>
+      <div class="factor-card" style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--moss); font-weight:900;">15</div>
+        <div class="factor-name" style="font-size:0.85rem;">Fish Species</div>
+      </div>
+      <div class="factor-card" style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--gold); font-weight:900;">3</div>
+        <div class="factor-name" style="font-size:0.85rem;">Consumer Levels</div>
+      </div>
+      <div class="factor-card" style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--sand); font-weight:900;">6</div>
+        <div class="factor-name" style="font-size:0.85rem;">Abiotic Factors</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="transition-delay:0.9s; margin-top:3rem; text-align:center;">
+      <div class="handwritten" style="font-size:1.4rem; color:var(--sand);">
+        — Karimganj College · Department of Ecology & Environmental Science —
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Rating Badge -->
+<div class="rating-badge">
+  <div>
+    <div class="rating-num">9.2</div>
+    <div class="rating-stars">★★★★★</div>
+  </div>
+  <div>
+    <div style="font-size:0.75rem; color:var(--foam); font-weight:500;">Design Score</div>
+    <div class="rating-sub">out of 10</div>
+  </div>
+</div>
+
+<script>
+// ===== CURSOR =====
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 6 + 'px';
+  cursor.style.top = my - 6 + 'px';
+});
+
+function animateCursor() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) *.12;
+  ring.style.left = rx - 18 + 'px';
+  ring.style.top = ry - 18 + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// ===== PROGRESS BAR =====
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// ===== CANVAS POND =====
+const canvas = document.getElementById('pondCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Ripples
+const ripples = [];
+class Ripple {
+  constructor(x, y) {
+    this.x = x; this.y = y;
+    this.r = 0; this.opacity = 0.8;
+    this.speed = Math.random() * 1.5 + 0.8;
+  }
+  update() {
+    this.r += this.speed;
+    this.opacity -= 0.008;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(34,211,238,${this.opacity})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+// Fish
+const fishArr = [];
+class Fish {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = -50;
+    this.y = canvas.height * (0.3 + Math.random() * 0.5);
+    this.speed = Math.random() * 1.2 + 0.4;
+    this.size = Math.random() * 12 + 6;
+    this.angle = (Math.random() - 0.5) * 0.3;
+    this.color = `rgba(${Math.floor(Math.random()*100+100)},${Math.floor(Math.random()*100+150)},${Math.floor(Math.random()*50+200)},0.6)`;
+  }
+  update() {
+    this.x += this.speed;
+    this.y += Math.sin(this.x * 0.01) * 0.5;
+    if (this.x > canvas.width + 50) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-this.size, 0);
+    ctx.lineTo(-this.size * 1.6, -this.size * 0.5);
+    ctx.lineTo(-this.size * 1.6, this.size * 0.5);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 8; i++) {
+  const f = new Fish();
+  f.x = Math.random() * canvas.width;
+  fishArr.push(f);
+}
+
+// Stars / particles
+const stars = [];
+for (let i = 0; i < 80; i++) {
+  stars.push({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 1.5,
+    opacity: Math.random() * 0.5 + 0.1,
+    twinkle: Math.random() * 0.02
+  });
+}
+
+let t = 0;
+function drawPond() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Deep water gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#04101f');
+  grad.addColorStop(0.5, '#071a30');
+  grad.addColorStop(1, '#0a2240');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Stars (reflections)
+  stars.forEach(s => {
+    s.opacity += (Math.random() - 0.5) * s.twinkle;
+    s.opacity = Math.max(0.05, Math.min(0.6, s.opacity));
+    ctx.beginPath();
+    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(207,250,254,${s.opacity})`;
+    ctx.fill();
+  });
+
+  // Water waves
+  for (let w = 0; w < 5; w++) {
+    ctx.beginPath();
+    const waveY = canvas.height * 0.4 + w * 60;
+    ctx.moveTo(0, waveY);
+    for (let x = 0; x <= canvas.width; x += 5) {
+      const y = waveY + Math.sin((x * 0.008) + t * 0.5 + w * 0.8) * 12 + Math.sin((x * 0.015) + t * 0.3) * 5;
+      ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(34,211,238,${0.04 - w * 0.006})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Lily pad silhouettes
+  [[0.15, 0.65], [0.7, 0.75], [0.45, 0.85], [0.85, 0.6]].forEach(([px, py]) => {
+    const x = px * canvas.width, y = py * canvas.height;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 35, 20, Math.PI * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(22,163,74,0.15)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(74,222,128,0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Ripples
+  ripples.forEach((r, i) => {
+    r.update(); r.draw();
+    if (r.opacity <= 0) ripples.splice(i, 1);
+  });
+
+  // Fish
+  fishArr.forEach(f => { f.update(); f.draw(); });
+
+  // Glow center
+  const radGrad = ctx.createRadialGradient(canvas.width*0.5, canvas.height*0.5, 0, canvas.width*0.5, canvas.height*0.5, canvas.width*0.4);
+  radGrad.addColorStop(0, 'rgba(34,211,238,0.04)');
+  radGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = radGrad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  t += 0.015;
+  requestAnimationFrame(drawPond);
+}
+
+drawPond();
+
+// Random ripples
+setInterval(() => {
+  ripples.push(new Ripple(
+    Math.random() * canvas.width,
+    canvas.height * 0.3 + Math.random() * canvas.height * 0.6
+  ));
+}, 1200);
+
+// Mouse ripple
+canvas.addEventListener('click', e => {
+  const r = canvas.getBoundingClientRect();
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top)), i * 150);
+  }
+});
+
+// ===== SCROLL REVEAL =====
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+reveals.forEach(el => observer.observe(el));
+
+// ===== PARTICLES =====
+const pContainer = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.bottom = Math.random() * 100 + 'vh';
+  p.style.animationDuration = (Math.random() * 8 + 6) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.opacity = 0;
+  pContainer.appendChild(p);
+}
+</script>
+</body>
+</html>
