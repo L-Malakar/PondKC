@@ -172,6 +172,55 @@
   }
   .nav-links a:hover { color: var(--aqua); }
 
+  /* Hamburger */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+    z-index: 1100;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--aqua);
+    border-radius: 2px;
+    transition: all 0.35s ease;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile nav overlay */
+  .nav-mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,22,40,0.97);
+    z-index: 1050;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .nav-mobile-overlay.open {
+    opacity: 1;
+  }
+  .nav-mobile-overlay a {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: rgba(207,250,254,0.7);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .nav-mobile-overlay a:hover { color: var(--aqua); }
+
   /* ===== SECTIONS ===== */
   section {
     min-height: 100vh;
@@ -742,6 +791,150 @@
     font-size: 1.1rem;
     color: var(--sand);
   }
+
+  /* ===== 3D WATER BUBBLES ===== */
+  #bubble-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+  .w-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 28%,
+      rgba(255,255,255,0.35) 0%,
+      rgba(34,211,238,0.08) 40%,
+      rgba(34,211,238,0.03) 70%,
+      transparent 100%
+    );
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow:
+      inset -3px -3px 8px rgba(0,0,0,0.15),
+      inset 2px 2px 6px rgba(255,255,255,0.25),
+      0 0 12px rgba(34,211,238,0.08);
+    will-change: transform;
+    animation: bubbleDrift var(--dur) var(--delay) ease-in-out infinite alternate;
+  }
+  .w-bubble::after {
+    content: '';
+    position: absolute;
+    top: 18%; left: 22%;
+    width: 28%; height: 18%;
+    background: rgba(255,255,255,0.55);
+    border-radius: 50%;
+    transform: rotate(-35deg);
+    filter: blur(2px);
+  }
+  @keyframes bubbleDrift {
+    0%   { transform: translateY(0px) translateX(0px) scale(1); }
+    33%  { transform: translateY(-18px) translateX(8px) scale(1.03); }
+    66%  { transform: translateY(-6px) translateX(-10px) scale(0.97); }
+    100% { transform: translateY(-28px) translateX(4px) scale(1.01); }
+  }
+
+  /* ===== SMOOTH SECTION TRANSITIONS ===== */
+  .section-transition {
+    opacity: 0;
+    transform: translateY(60px) scale(0.98);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  .section-transition.in-view {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* ===== MOBILE & TABLET RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+
+    .section-inner { padding: 5rem 1.5rem; }
+
+    .hero-title { font-size: clamp(2.8rem, 10vw, 5rem); }
+    .hero-title span { font-size: clamp(2rem, 7vw, 3.5rem); }
+
+    .factors-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+    .chain-visual {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .chain-arrow { padding: 0 0.25rem; font-size: 1.1rem; }
+    .chain-circle { width: 85px; height: 85px; }
+
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 500px; }
+
+    .fish-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .meta-strip { gap: 1.5rem; }
+
+    /* Food web SVG — scale down on tablet */
+    #foodweb svg { max-height: 380px; }
+
+    .rating-badge { bottom: 1rem; right: 1rem; padding: 0.5rem 0.9rem; }
+    .rating-num { font-size: 1.4rem; }
+
+    /* Cursor hidden on touch */
+    .cursor, .cursor-ring { display: none; }
+    body { cursor: auto; }
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem 1.2rem; }
+    .section-inner { padding: 4.5rem 1rem 3rem; }
+    .section-title { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+
+    .factors-grid { grid-template-columns: 1fr !important; }
+    .fish-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+    .chain-visual { gap: 0.3rem; }
+    .chain-circle { width: 72px; height: 72px; }
+    .chain-emoji { font-size: 1.5rem; }
+    .chain-arrow { font-size: 0.9rem; padding: 0 0.1rem; margin-bottom: 1.4rem; }
+
+    /* Food web — portrait phone gets scrollable container */
+    .foodweb-scroll-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.5rem;
+    }
+    #foodweb svg { min-width: 600px; max-height: 340px; }
+
+    .quote-block { padding: 2rem 1.2rem; }
+    .quote-text { font-size: 1.05rem; }
+
+    .hero-title { font-size: clamp(2.2rem, 11vw, 3.5rem); }
+    .hero-title span { font-size: clamp(1.6rem, 8vw, 2.5rem); }
+    .college-badge { font-size: 0.58rem; letter-spacing: 0.2em; }
+
+    .scroll-cue { bottom: 1.5rem; }
+
+    .ripple-divider { height: 70px; }
+
+    /* Rating badge smaller */
+    .rating-badge { display: none; }
+  }
+
+  /* Landscape phone */
+  @media (max-width: 900px) and (orientation: landscape) {
+    #hero { min-height: 100svh; }
+    .section-inner { padding: 4rem 2rem; }
+    .chain-visual { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 1rem; }
+    .chain-circle { width: 80px; height: 80px; }
+  }
+
+  /* Large tablets portrait */
+  @media (min-width: 601px) and (max-width: 900px) {
+    .factors-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .fish-grid { grid-template-columns: repeat(3, 1fr); }
+    #foodweb svg { max-height: 420px; }
+  }
 </style>
 </head>
 <body>
@@ -752,6 +945,20 @@
 
 <!-- Floating particles -->
 <div class="particles" id="particles"></div>
+
+<!-- 3D Water Bubbles Layer -->
+<div id="bubble-layer"></div>
+
+<!-- Mobile Nav Overlay -->
+<div class="nav-mobile-overlay" id="mobileNav">
+  <a href="#intro" onclick="closeMobileNav()">Intro</a>
+  <a href="#abiotic" onclick="closeMobileNav()">Abiotic</a>
+  <a href="#biotic" onclick="closeMobileNav()">Biotic</a>
+  <a href="#producers" onclick="closeMobileNav()">Producers</a>
+  <a href="#fish" onclick="closeMobileNav()">Fish Species</a>
+  <a href="#foodweb" onclick="closeMobileNav()">Food Web</a>
+  <a href="#conclusion" onclick="closeMobileNav()">Conclusion</a>
+</div>
 
 <!-- NAVIGATION -->
 <nav>
@@ -764,6 +971,9 @@
     <li><a href="#fish">Fish Species</a></li>
     <li><a href="#conclusion">Conclusion</a></li>
   </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- HERO -->
@@ -1137,68 +1347,86 @@
       <p class="section-body">The decomposer food web illustrates how energy and nutrients cycle through the microscopic community of the pond — a hidden world that keeps the entire ecosystem functioning.</p>
     </div>
 
-    <!-- Interactive SVG food web -->
-    <div class="reveal" style="transition-delay:0.3s; margin-top:3rem;">
-      <svg viewBox="0 0 800 480" width="100%" style="max-height:480px;" xmlns="http://www.w3.org/2000/svg">
+    <!-- Interactive SVG food web - hand-drawn style arrows -->
+    <div class="reveal foodweb-scroll-wrap" style="transition-delay:0.3s; margin-top:3rem;">
+      <svg viewBox="0 0 800 480" width="100%" style="max-height:480px; font-family:'Caveat',cursive;" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-            <polygon points="0 0, 8 3, 0 6" fill="rgba(34,211,238,0.5)"/>
+          <!-- Hand-drawn style arrowhead -->
+          <marker id="arrow-hd" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(34,211,238,0.7)" stroke="none"/>
+          </marker>
+          <marker id="arrow-hd-dashed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(34,211,238,0.35)" stroke="none"/>
+          </marker>
+          <marker id="arrow-hd-green" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(74,222,128,0.7)" stroke="none"/>
           </marker>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
             <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
+          <filter id="sketchy">
+            <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="2" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
         </defs>
 
-        <!-- Arrows -->
-        <line x1="180" y1="180" x2="390" y2="220" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="180" y1="180" x2="580" y2="100" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="390" y1="250" x2="580" y2="100" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="390" y1="250" x2="580" y2="380" stroke="rgba(245,158,11,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="390" y1="250" x2="200" y2="380" stroke="rgba(245,158,11,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="580" y1="420" x2="580" y2="150" stroke="rgba(34,211,238,0.2)" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
-        <line x1="580" y1="420" x2="620" y2="260" stroke="rgba(34,211,238,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <line x1="650" y1="280" x2="650" y2="150" stroke="rgba(74,222,128,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <!-- Hand-drawn arrows (slightly wobbly paths matching hand-drawn diagram) -->
+        <!-- Phytoplankton → Bacteria -->
+        <path d="M212,178 C270,190 320,205 345,225" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Phytoplankton → Detritus -->
+        <path d="M210,162 C320,145 450,130 558,112" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Bacteria → Detritus -->
+        <path d="M450,220 C490,185 525,155 560,118" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Bacteria → DOC (Dissolved Organic Carbon) -->
+        <path d="M360,260 C310,295 265,340 220,368" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Bacteria → Virus -->
+        <path d="M400,290 C400,320 400,350 400,353" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Protozoa → Zooplankton -->
+        <path d="M660,376 C660,360 660,345 660,342" fill="none" stroke="rgba(168,85,247,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-green)"/>
+        <!-- Zooplankton → Detritus (dashed) -->
+        <path d="M638,265 C625,220 615,175 612,158" fill="none" stroke="rgba(34,211,238,0.4)" stroke-width="1.8" stroke-dasharray="5,4" stroke-linecap="round" marker-end="url(#arrow-hd-dashed)"/>
+        <!-- Bacteria → Zooplankton -->
+        <path d="M454,238 C520,250 570,262 608,272" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
 
+        <!-- Nodes -->
         <!-- Phytoplankton -->
-        <circle cx="160" cy="170" r="52" fill="rgba(22,163,74,0.2)" stroke="#4ade80" stroke-width="1.5" filter="url(#glow)"/>
+        <circle cx="160" cy="170" r="52" fill="rgba(22,163,74,0.2)" stroke="#4ade80" stroke-width="1.8" filter="url(#glow)"/>
         <text x="160" y="163" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600" letter-spacing="0.5">PHYTO</text>
         <text x="160" y="178" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600">PLANKTON</text>
         <text x="160" y="195" text-anchor="middle" fill="rgba(74,222,128,0.5)" font-size="9">🌿</text>
 
         <!-- Bacteria -->
-        <circle cx="400" cy="235" r="55" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.5" filter="url(#glow)"/>
+        <circle cx="400" cy="235" r="55" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.8" filter="url(#glow)"/>
         <text x="400" y="230" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600" letter-spacing="0.5">BACTERIA</text>
         <text x="400" y="248" text-anchor="middle" fill="rgba(245,158,11,0.5)" font-size="12">🦠</text>
 
         <!-- Detritus -->
-        <circle cx="610" cy="110" r="50" fill="rgba(212,165,116,0.2)" stroke="#d4a574" stroke-width="1.5"/>
+        <circle cx="610" cy="110" r="50" fill="rgba(212,165,116,0.2)" stroke="#d4a574" stroke-width="1.8"/>
         <text x="610" y="105" text-anchor="middle" fill="#d4a574" font-size="10" font-weight="600">DETRITUS</text>
         <text x="610" y="122" text-anchor="middle" fill="rgba(212,165,116,0.5)" font-size="11">🍂</text>
 
         <!-- Virus -->
-        <circle cx="400" cy="395" r="42" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="1.5"/>
+        <circle cx="400" cy="395" r="42" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="1.8"/>
         <text x="400" y="390" text-anchor="middle" fill="#f87171" font-size="10" font-weight="600">VIRUS</text>
         <text x="400" y="408" text-anchor="middle" fill="rgba(239,68,68,0.5)" font-size="10">⚗️</text>
 
         <!-- DOC -->
-        <circle cx="170" cy="385" r="48" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+        <circle cx="170" cy="385" r="48" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.8"/>
         <text x="170" y="375" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">DISSOLVED</text>
         <text x="170" y="390" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">ORGANIC</text>
         <text x="170" y="405" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">CARBON</text>
 
         <!-- Zooplankton -->
-        <circle cx="660" cy="290" r="50" fill="rgba(14,116,144,0.2)" stroke="#22d3ee" stroke-width="1.5" filter="url(#glow)"/>
+        <circle cx="660" cy="290" r="50" fill="rgba(14,116,144,0.2)" stroke="#22d3ee" stroke-width="1.8" filter="url(#glow)"/>
         <text x="660" y="283" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600" letter-spacing="0.5">ZOO</text>
         <text x="660" y="297" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600">PLANKTON</text>
         <text x="660" y="313" text-anchor="middle" fill="rgba(34,211,238,0.5)" font-size="11">🦐</text>
 
         <!-- Protozoa -->
-        <circle cx="660" cy="420" r="44" fill="rgba(168,85,247,0.2)" stroke="#c084fc" stroke-width="1.5"/>
+        <circle cx="660" cy="420" r="44" fill="rgba(168,85,247,0.2)" stroke="#c084fc" stroke-width="1.8"/>
         <text x="660" y="415" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">PROTOZOA</text>
         <text x="660" y="432" text-anchor="middle" fill="rgba(192,132,252,0.5)" font-size="10">🔬</text>
-
-        <line x1="660" y1="375" x2="660" y2="340" stroke="rgba(168,85,247,0.35)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
       </svg>
     </div>
   </div>
@@ -1287,25 +1515,49 @@
 </div>
 
 <script>
-// ===== CURSOR =====
+// ===== MOBILE NAV =====
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  const isOpen = nav.style.display === 'flex';
+  if (isOpen) {
+    nav.style.opacity = '0';
+    btn.classList.remove('open');
+    setTimeout(() => { nav.style.display = 'none'; }, 400);
+  } else {
+    nav.style.display = 'flex';
+    requestAnimationFrame(() => { nav.style.opacity = '1'; });
+    btn.classList.add('open');
+  }
+}
+function closeMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  nav.style.opacity = '0';
+  btn.classList.remove('open');
+  setTimeout(() => { nav.style.display = 'none'; }, 400);
+}
+
+// ===== CURSOR (desktop only) =====
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx - 6 + 'px';
-  cursor.style.top = my - 6 + 'px';
-});
-
-function animateCursor() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) *.12;
-  ring.style.left = rx - 18 + 'px';
-  ring.style.top = ry - 18 + 'px';
-  requestAnimationFrame(animateCursor);
+if (window.matchMedia('(pointer:fine)').matches) {
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+  function animateCursor() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx - 18 + 'px';
+    ring.style.top = ry - 18 + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
 }
-animateCursor();
 
 // ===== PROGRESS BAR =====
 window.addEventListener('scroll', () => {
@@ -1324,7 +1576,6 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Ripples
 const ripples = [];
 class Ripple {
   constructor(x, y) {
@@ -1332,10 +1583,7 @@ class Ripple {
     this.r = 0; this.opacity = 0.8;
     this.speed = Math.random() * 1.5 + 0.8;
   }
-  update() {
-    this.r += this.speed;
-    this.opacity -= 0.008;
-  }
+  update() { this.r += this.speed; this.opacity -= 0.008; }
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
@@ -1345,18 +1593,14 @@ class Ripple {
   }
 }
 
-// Fish
 const fishArr = [];
 class Fish {
-  constructor() {
-    this.reset();
-  }
+  constructor() { this.reset(); }
   reset() {
     this.x = -50;
     this.y = canvas.height * (0.3 + Math.random() * 0.5);
     this.speed = Math.random() * 1.2 + 0.4;
     this.size = Math.random() * 12 + 6;
-    this.angle = (Math.random() - 0.5) * 0.3;
     this.color = `rgba(${Math.floor(Math.random()*100+100)},${Math.floor(Math.random()*100+150)},${Math.floor(Math.random()*50+200)},0.6)`;
   }
   update() {
@@ -1388,30 +1632,20 @@ for (let i = 0; i < 8; i++) {
   fishArr.push(f);
 }
 
-// Stars / particles
 const stars = [];
 for (let i = 0; i < 80; i++) {
-  stars.push({
-    x: Math.random(), y: Math.random(),
-    r: Math.random() * 1.5,
-    opacity: Math.random() * 0.5 + 0.1,
-    twinkle: Math.random() * 0.02
-  });
+  stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.5, opacity: Math.random() * 0.5 + 0.1, twinkle: Math.random() * 0.02 });
 }
 
 let t = 0;
 function drawPond() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Deep water gradient
   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
   grad.addColorStop(0, '#04101f');
   grad.addColorStop(0.5, '#071a30');
   grad.addColorStop(1, '#0a2240');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Stars (reflections)
   stars.forEach(s => {
     s.opacity += (Math.random() - 0.5) * s.twinkle;
     s.opacity = Math.max(0.05, Math.min(0.6, s.opacity));
@@ -1420,8 +1654,6 @@ function drawPond() {
     ctx.fillStyle = `rgba(207,250,254,${s.opacity})`;
     ctx.fill();
   });
-
-  // Water waves
   for (let w = 0; w < 5; w++) {
     ctx.beginPath();
     const waveY = canvas.height * 0.4 + w * 60;
@@ -1431,68 +1663,55 @@ function drawPond() {
       ctx.lineTo(x, y);
     }
     ctx.strokeStyle = `rgba(34,211,238,${0.04 - w * 0.006})`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.lineWidth = 1; ctx.stroke();
   }
-
-  // Lily pad silhouettes
   [[0.15, 0.65], [0.7, 0.75], [0.45, 0.85], [0.85, 0.6]].forEach(([px, py]) => {
     const x = px * canvas.width, y = py * canvas.height;
     ctx.beginPath();
     ctx.ellipse(x, y, 35, 20, Math.PI * 0.2, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(22,163,74,0.15)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(74,222,128,0.2)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.fillStyle = 'rgba(22,163,74,0.15)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(74,222,128,0.2)'; ctx.lineWidth = 1; ctx.stroke();
   });
-
-  // Ripples
-  ripples.forEach((r, i) => {
-    r.update(); r.draw();
-    if (r.opacity <= 0) ripples.splice(i, 1);
-  });
-
-  // Fish
+  ripples.forEach((r, i) => { r.update(); r.draw(); if (r.opacity <= 0) ripples.splice(i, 1); });
   fishArr.forEach(f => { f.update(); f.draw(); });
-
-  // Glow center
   const radGrad = ctx.createRadialGradient(canvas.width*0.5, canvas.height*0.5, 0, canvas.width*0.5, canvas.height*0.5, canvas.width*0.4);
   radGrad.addColorStop(0, 'rgba(34,211,238,0.04)');
   radGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = radGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   t += 0.015;
   requestAnimationFrame(drawPond);
 }
-
 drawPond();
-
-// Random ripples
-setInterval(() => {
-  ripples.push(new Ripple(
-    Math.random() * canvas.width,
-    canvas.height * 0.3 + Math.random() * canvas.height * 0.6
-  ));
-}, 1200);
-
-// Mouse ripple
+setInterval(() => ripples.push(new Ripple(Math.random() * canvas.width, canvas.height * 0.3 + Math.random() * canvas.height * 0.6)), 1200);
 canvas.addEventListener('click', e => {
   const r = canvas.getBoundingClientRect();
-  for (let i = 0; i < 3; i++) {
-    setTimeout(() => ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top)), i * 150);
-  }
+  for (let i = 0; i < 3; i++) setTimeout(() => ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top)), i * 150);
 });
 
 // ===== SCROLL REVEAL =====
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) e.target.classList.add('visible');
-  });
-}, { threshold: 0.15 });
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
 reveals.forEach(el => observer.observe(el));
+
+// ===== SMOOTH SECTION TRANSITIONS =====
+const sections = document.querySelectorAll('section');
+const secObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in-view');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+sections.forEach(sec => {
+  sec.classList.add('section-transition');
+  // Hero starts visible immediately
+  if (sec.id === 'hero') sec.classList.add('in-view');
+  else secObserver.observe(sec);
+});
 
 // ===== PARTICLES =====
 const pContainer = document.getElementById('particles');
@@ -1506,6 +1725,66 @@ for (let i = 0; i < 30; i++) {
   p.style.opacity = 0;
   pContainer.appendChild(p);
 }
+
+// ===== 3D WATER BUBBLES (scroll-parallax) =====
+(function() {
+  const layer = document.getElementById('bubble-layer');
+  const bubbleData = [];
+  const COUNT = window.innerWidth < 600 ? 14 : 22;
+
+  for (let i = 0; i < COUNT; i++) {
+    const size = 18 + Math.random() * 55;
+    const dur = 4 + Math.random() * 7;
+    const delay = -(Math.random() * 10);
+    const startX = Math.random() * 100;  // vw
+    const startY = 10 + Math.random() * 80; // vh base
+    const speed = 0.04 + Math.random() * 0.12; // parallax speed
+    const phase = Math.random() * Math.PI * 2;
+
+    const el = document.createElement('div');
+    el.className = 'w-bubble';
+    el.style.setProperty('--dur', dur + 's');
+    el.style.setProperty('--delay', delay + 's');
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = startX + 'vw';
+    el.style.opacity = 0.35 + Math.random() * 0.45;
+
+    layer.appendChild(el);
+    bubbleData.push({ el, startY, speed, phase, size });
+  }
+
+  let lastScroll = 0;
+  let ticking = false;
+
+  function updateBubbles(scrollY) {
+    bubbleData.forEach((b, i) => {
+      // Parallax: each bubble moves at its own speed relative to scroll
+      const offsetY = scrollY * b.speed;
+      // Slight horizontal sway based on scroll momentum
+      const swayX = Math.sin(scrollY * 0.002 + b.phase) * 12;
+      // 3D-ish scale shift based on scroll position
+      const scrollFraction = (scrollY / (document.body.scrollHeight - window.innerHeight));
+      const scaleZ = 0.85 + Math.sin(scrollFraction * Math.PI * 2 + b.phase) * 0.18;
+
+      b.el.style.top = `calc(${b.startY}vh - ${offsetY * 0.6}px)`;
+      b.el.style.transform = `translateX(${swayX}px) scale(${scaleZ})`;
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    lastScroll = window.scrollY;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        updateBubbles(lastScroll);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  updateBubbles(0);
+})();
 </script>
 </body>
 </html>
