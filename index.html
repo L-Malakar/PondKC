@@ -20,7 +20,6 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -68,11 +67,57 @@
     width: 100%; height: 100%;
   }
 
+  /* Caustic light overlay */
+  .caustics {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    background:
+      radial-gradient(ellipse 80px 60px at 20% 30%, rgba(34,211,238,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 60px 80px at 50% 60%, rgba(34,211,238,0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 90px 50px at 80% 20%, rgba(34,211,238,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 70px 70px at 35% 80%, rgba(34,211,238,0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 100px 60px at 70% 70%, rgba(34,211,238,0.5) 0%, transparent 70%);
+    animation: causticShift 8s ease-in-out infinite alternate;
+    z-index: 2;
+    mix-blend-mode: screen;
+  }
+  @keyframes causticShift {
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    25%  { transform: translate(30px, -20px) scale(1.05) rotate(1deg); }
+    50%  { transform: translate(-20px, 15px) scale(0.95) rotate(-1deg); }
+    75%  { transform: translate(15px, 25px) scale(1.03) rotate(0.5deg); }
+    100% { transform: translate(-10px, -15px) scale(1.02) rotate(-0.5deg); }
+  }
+
+  /* Second caustic layer for depth */
+  .caustics-2 {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background:
+      radial-gradient(ellipse 120px 40px at 15% 50%, rgba(74,222,128,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 50px 100px at 65% 35%, rgba(74,222,128,0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 80px 60px at 90% 75%, rgba(74,222,128,0.3) 0%, transparent 70%);
+    animation: causticShift2 12s ease-in-out infinite alternate;
+    z-index: 2;
+    mix-blend-mode: screen;
+  }
+  @keyframes causticShift2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-40px, 30px) scale(1.08); }
+    66%  { transform: translate(25px, -35px) scale(0.93); }
+    100% { transform: translate(-15px, 10px) scale(1.04); }
+  }
+
   .hero-content {
     position: relative;
     z-index: 10;
     text-align: center;
     padding: 2rem;
+    transition: transform 0.15s ease-out;
   }
 
   .college-badge {
@@ -150,6 +195,12 @@
     align-items: center;
     background: linear-gradient(to bottom, rgba(10,22,40,0.9), transparent);
     backdrop-filter: blur(2px);
+    transition: background 0.4s, backdrop-filter 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(10,22,40,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(34,211,238,0.08);
   }
   .nav-logo {
     font-family: 'Playfair Display', serif;
@@ -168,11 +219,20 @@
     text-transform: uppercase;
     color: rgba(207,250,254,0.6);
     text-decoration: none;
-    transition: color 0.3s;
+    transition: color 0.3s, text-shadow 0.3s;
+    position: relative;
   }
-  .nav-links a:hover { color: var(--aqua); }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--aqua);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--aqua); text-shadow: 0 0 12px rgba(34,211,238,0.3); }
+  .nav-links a:hover::after { width: 100%; }
 
-  /* Hamburger */
   .nav-hamburger {
     display: none;
     flex-direction: column;
@@ -194,7 +254,6 @@
   .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
   .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  /* Mobile nav overlay */
   .nav-mobile-overlay {
     display: none;
     position: fixed;
@@ -208,18 +267,16 @@
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-  .nav-mobile-overlay.open {
-    opacity: 1;
-  }
+  .nav-mobile-overlay.open { opacity: 1; }
   .nav-mobile-overlay a {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
     color: rgba(207,250,254,0.7);
     text-decoration: none;
     letter-spacing: 0.05em;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.3s;
   }
-  .nav-mobile-overlay a:hover { color: var(--aqua); }
+  .nav-mobile-overlay a:hover { color: var(--aqua); transform: translateX(8px); }
 
   /* ===== SECTIONS ===== */
   section {
@@ -261,16 +318,117 @@
   #intro {
     background: linear-gradient(180deg, var(--deep) 0%, #061529 100%);
   }
-  #intro::before {
+
+  /* Morphing blob decoration */
+  .morph-blob {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    animation: morphBlob 20s ease-in-out infinite alternate;
+  }
+  .morph-blob.b1 {
+    right: -150px; top: 20%;
+    background: radial-gradient(circle, rgba(14,116,144,0.8), rgba(14,116,144,0.1));
+  }
+  .morph-blob.b2 {
+    left: -100px; bottom: 10%;
+    background: radial-gradient(circle, rgba(22,163,74,0.6), rgba(22,163,74,0.05));
+    animation-delay: -7s;
+    width: 400px; height: 400px;
+  }
+  .morph-blob.b3 {
+    right: 30%; top: -100px;
+    background: radial-gradient(circle, rgba(245,158,11,0.4), rgba(245,158,11,0.02));
+    animation-delay: -14s;
+    width: 350px; height: 350px;
+  }
+  @keyframes morphBlob {
+    0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+    25%  { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(90deg) scale(1.1); }
+    50%  { border-radius: 50% 60% 30% 60% / 30% 70% 50% 60%; transform: rotate(180deg) scale(0.95); }
+    75%  { border-radius: 60% 30% 60% 40% / 70% 40% 60% 30%; transform: rotate(270deg) scale(1.05); }
+    100% { border-radius: 40% 60% 50% 50% / 60% 50% 40% 60%; transform: rotate(360deg) scale(1); }
+  }
+
+  /* ===== 3D FLOATING GEOMETRY ===== */
+  .float-3d {
+    position: absolute;
+    pointer-events: none;
+    perspective: 600px;
+    z-index: 1;
+  }
+  .float-3d .shape {
+    animation: float3DRotate var(--dur, 15s) linear infinite;
+    transform-style: preserve-3d;
+  }
+  @keyframes float3DRotate {
+    0%   { transform: rotateY(0deg) rotateX(0deg) translateY(0px); }
+    25%  { transform: rotateY(90deg) rotateX(15deg) translateY(-20px); }
+    50%  { transform: rotateY(180deg) rotateX(0deg) translateY(0px); }
+    75%  { transform: rotateY(270deg) rotateX(-15deg) translateY(20px); }
+    100% { transform: rotateY(360deg) rotateX(0deg) translateY(0px); }
+  }
+
+  .tri-shape {
+    width: 0; height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 52px solid rgba(34,211,238,0.12);
+  }
+  .diamond-shape {
+    width: 40px; height: 40px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.15);
+    transform: rotate(45deg);
+    animation: float3DRotate 18s linear infinite, diamondPulse 4s ease-in-out infinite;
+  }
+  @keyframes diamondPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(74,222,128,0); }
+    50% { box-shadow: 0 0 20px rgba(74,222,128,0.15); }
+  }
+  .hex-shape {
+    width: 50px; height: 28px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.12);
+    position: relative;
+  }
+  .hex-shape::before, .hex-shape::after {
     content: '';
     position: absolute;
-    right: -100px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(14,116,144,0.15) 0%, transparent 70%);
-    border-radius: 50%;
+    width: 0; height: 0;
+    left: 50%; transform: translateX(-50%);
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
   }
+  .hex-shape::before { top: -14px; border-bottom: 14px solid rgba(245,158,11,0.12); }
+  .hex-shape::after { bottom: -14px; border-top: 14px solid rgba(245,158,11,0.12); }
+
+  .ring-shape {
+    width: 50px; height: 50px;
+    border: 2px solid rgba(34,211,238,0.15);
+    border-radius: 50%;
+    animation: float3DRotate 20s linear infinite, ringPulse 3s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%, 100% { transform: rotate(0deg) scale(1); border-color: rgba(34,211,238,0.15); }
+    50% { transform: rotate(180deg) scale(1.15); border-color: rgba(34,211,238,0.3); }
+  }
+
+  .cross-shape {
+    width: 40px; height: 40px;
+    position: relative;
+  }
+  .cross-shape::before, .cross-shape::after {
+    content: '';
+    position: absolute;
+    background: rgba(34,211,238,0.1);
+    border-radius: 2px;
+  }
+  .cross-shape::before { width: 4px; height: 100%; left: 50%; transform: translateX(-50%); }
+  .cross-shape::after { width: 100%; height: 4px; top: 50%; transform: translateY(-50%); }
 
   /* ===== RIPPLE DIVIDER ===== */
   .ripple-divider {
@@ -279,10 +437,7 @@
     position: relative;
     overflow: hidden;
   }
-  .ripple-divider svg {
-    width: 100%;
-    height: 100%;
-  }
+  .ripple-divider svg { width: 100%; height: 100%; }
 
   /* ===== ABIOTIC SECTION ===== */
   #abiotic {
@@ -305,6 +460,9 @@
     overflow: hidden;
     transition: all 0.4s ease;
     cursor: default;
+    transform-style: preserve-3d;
+    perspective: 800px;
+    will-change: transform;
   }
   .factor-card::before {
     content: '';
@@ -315,17 +473,56 @@
     transform: scaleX(0);
     transition: transform 0.4s;
   }
+  /* Animated border glow on hover */
+  .factor-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    background: conic-gradient(from var(--card-angle, 0deg), transparent, rgba(34,211,238,0.3), transparent, transparent);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .factor-card:hover::after { opacity: 1; }
   .factor-card:hover { 
-    transform: translateY(-6px);
     border-color: rgba(34,211,238,0.4);
     background: rgba(13,59,94,0.7);
   }
   .factor-card:hover::before { transform: scaleX(1); }
 
+  /* Shimmer effect on cards */
+  .card-shimmer {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34,211,238,0.06), transparent);
+    pointer-events: none;
+    transition: none;
+  }
+  .factor-card:hover .card-shimmer {
+    animation: shimmerSlide 0.8s ease forwards;
+  }
+  @keyframes shimmerSlide {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
   .factor-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    display: inline-block;
+    transition: transform 0.4s;
   }
+  .factor-card:hover .factor-icon {
+    animation: iconBounce 0.6s ease;
+  }
+  @keyframes iconBounce {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.2) rotate(-8deg); }
+    60% { transform: scale(0.95) rotate(4deg); }
+  }
+
   .factor-name {
     font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
@@ -370,15 +567,30 @@
     justify-content: center;
     border: 2px solid;
     position: relative;
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .chain-circle:hover { transform: scale(1.12); }
+  .chain-circle:hover { transform: scale(1.15) translateY(-5px); }
 
-  .chain-circle.producer { border-color: var(--moss); background: rgba(22,163,74,0.15); }
-  .chain-circle.primary { border-color: var(--aqua); background: rgba(14,116,144,0.15); }
-  .chain-circle.secondary { border-color: var(--gold); background: rgba(245,158,11,0.15); }
-  .chain-circle.tertiary { border-color: #f87171; background: rgba(239,68,68,0.15); }
-  .chain-circle.decomposer { border-color: var(--sand); background: rgba(212,165,116,0.15); }
+  /* Pulsing ring on chain circles */
+  .chain-circle::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0;
+    animation: chainPulse 2.5s ease-out infinite;
+  }
+  .chain-circle.producer { border-color: var(--moss); background: rgba(22,163,74,0.15); color: var(--moss); }
+  .chain-circle.primary { border-color: var(--aqua); background: rgba(14,116,144,0.15); color: var(--aqua); }
+  .chain-circle.secondary { border-color: var(--gold); background: rgba(245,158,11,0.15); color: var(--gold); }
+  .chain-circle.tertiary { border-color: #f87171; background: rgba(239,68,68,0.15); color: #f87171; }
+  .chain-circle.decomposer { border-color: var(--sand); background: rgba(212,165,116,0.15); color: var(--sand); }
+
+  @keyframes chainPulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
 
   .chain-emoji { font-size: 2rem; }
   .chain-label {
@@ -400,6 +612,25 @@
     color: rgba(34,211,238,0.4);
     padding: 0 0.75rem;
     margin-bottom: 1.75rem;
+    position: relative;
+  }
+  /* Animated flowing dot in chain arrows */
+  .chain-arrow::after {
+    content: '';
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--aqua);
+    border-radius: 50%;
+    top: 50%;
+    left: 0;
+    animation: flowDot 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px var(--aqua);
+  }
+  @keyframes flowDot {
+    0% { left: 0; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { left: calc(100% - 6px); opacity: 0; }
   }
 
   /* ===== PRODUCERS TABLE ===== */
@@ -412,15 +643,31 @@
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid rgba(34,211,238,0.2);
+    position: relative;
+  }
+  /* Table shimmer effect */
+  .table-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34,211,238,0.03), transparent);
+    animation: tableShimmer 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes tableShimmer {
+    0%, 100% { left: -50%; }
+    50% { left: 100%; }
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
+    position: relative;
+    z-index: 2;
   }
-  thead tr {
-    background: rgba(14,116,144,0.4);
-  }
+  thead tr { background: rgba(14,116,144,0.4); }
   th {
     padding: 1.2rem 1.5rem;
     font-size: 0.7rem;
@@ -431,7 +678,7 @@
   }
   tbody tr {
     border-bottom: 1px solid rgba(34,211,238,0.08);
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.3s;
   }
   tbody tr:hover { background: rgba(14,116,144,0.15); }
   td {
@@ -468,12 +715,27 @@
     padding: 1.2rem;
     transition: all 0.3s;
     cursor: default;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  /* Fish card water line effect */
+  .fish-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--aqua), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
   }
   .fish-card:hover {
     border-color: rgba(34,211,238,0.35);
     background: rgba(14,59,94,0.6);
-    transform: translateY(-4px);
   }
+  .fish-card:hover::before { transform: scaleX(1); }
+
   .fish-common {
     font-weight: 500;
     font-size: 0.95rem;
@@ -514,51 +776,14 @@
     background: linear-gradient(180deg, #0a1628 0%, #061529 100%);
   }
 
-  .web-container {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    margin-top: 3rem;
+  /* SVG path draw animation */
+  .web-path-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition: stroke-dashoffset 2s ease;
   }
-
-  .web-node {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    cursor: default;
-  }
-
-  .web-bubble {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    transition: all 0.3s;
-    border: 1.5px solid;
-  }
-  .web-bubble:hover { transform: scale(1.2); }
-
-  .web-bubble.phyto { background: rgba(22,163,74,0.25); border-color: var(--moss); color: var(--moss); }
-  .web-bubble.bacteria { background: rgba(245,158,11,0.25); border-color: var(--gold); color: var(--gold); }
-  .web-bubble.zoo { background: rgba(14,116,144,0.25); border-color: var(--aqua); color: var(--aqua); }
-  .web-bubble.protozoa { background: rgba(168,85,247,0.25); border-color: #c084fc; color: #c084fc; }
-  .web-bubble.detritus { background: rgba(212,165,116,0.25); border-color: var(--sand); color: var(--sand); }
-  .web-bubble.doc { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
-  .web-bubble.virus { background: rgba(239,68,68,0.2); border-color: #f87171; color: #f87171; }
-
-  .web-label {
-    font-size: 0.6rem;
-    margin-top: 0.4rem;
-    color: rgba(207,250,254,0.5);
-    max-width: 90px;
-    line-height: 1.3;
+  .web-path-draw.drawn {
+    stroke-dashoffset: 0;
   }
 
   /* ===== CONCLUSION ===== */
@@ -566,7 +791,6 @@
     background: linear-gradient(180deg, #061529 0%, #0a1628 100%);
     text-align: center;
   }
-
   #conclusion .section-inner {
     display: flex;
     flex-direction: column;
@@ -581,6 +805,7 @@
     border: 1px solid rgba(34,211,238,0.2);
     border-radius: 24px;
     position: relative;
+    overflow: hidden;
   }
   .quote-block::before {
     content: '"';
@@ -592,6 +817,33 @@
     left: 1.5rem;
     line-height: 1;
   }
+  /* Animated border for quote */
+  .quote-block::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    border: 1px solid transparent;
+    background: conic-gradient(from var(--quote-angle, 0deg), transparent 60%, rgba(34,211,238,0.3), transparent 80%) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateQuoteBorder 4s linear infinite;
+  }
+  @keyframes rotateQuoteBorder {
+    to { --quote-angle: 360deg; }
+  }
+  @property --quote-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  @property --card-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
   .quote-text {
     font-family: 'Playfair Display', serif;
     font-size: 1.3rem;
@@ -609,9 +861,7 @@
     padding-top: 3rem;
     border-top: 1px solid rgba(34,211,238,0.1);
   }
-  .meta-item {
-    text-align: center;
-  }
+  .meta-item { text-align: center; }
   .meta-label {
     font-size: 0.6rem;
     letter-spacing: 0.2em;
@@ -623,6 +873,15 @@
     font-family: 'Playfair Display', serif;
     font-size: 1rem;
     color: var(--foam);
+  }
+
+  /* ===== ANIMATED COUNTER ===== */
+  .counter-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--aqua);
+    display: inline-block;
   }
 
   /* ===== RATING BADGE ===== */
@@ -642,7 +901,9 @@
     opacity: 0;
     transform: translateY(20px);
     animation: fadeUp 1s 2s forwards;
+    transition: transform 0.3s;
   }
+  .rating-badge:hover { transform: translateY(-4px) scale(1.05); }
   .rating-num {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
@@ -668,6 +929,20 @@
     height: 2px;
     background: linear-gradient(90deg, var(--aqua), transparent);
     margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .deco-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -40px;
+    width: 40px; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    animation: decoLineShine 3s ease-in-out infinite;
+  }
+  @keyframes decoLineShine {
+    0%, 100% { left: -40px; }
+    50% { left: 70px; }
   }
 
   .float-bubble {
@@ -684,37 +959,15 @@
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   @keyframes scrollPulse {
     0%, 100% { opacity: 1; transform: scaleY(1); }
     50% { opacity: 0.3; transform: scaleY(0.5); }
   }
-
   @keyframes float {
     0% { transform: translateY(100vh) scale(0); opacity: 0; }
     5% { opacity: 1; }
     90% { opacity: 0.3; }
     100% { transform: translateY(-20vh) scale(1); opacity: 0; }
-  }
-
-  @keyframes ripple {
-    0% { transform: scale(0); opacity: 1; }
-    100% { transform: scale(4); opacity: 0; }
-  }
-
-  @keyframes waveMove {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 0.8s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 
   /* ===== WATER SURFACE ANIMATION ===== */
@@ -725,14 +978,7 @@
     overflow: hidden;
     opacity: 0.3;
   }
-  .water-surface svg {
-    position: absolute;
-    bottom: 0;
-    width: 200%;
-    animation: waveMove 8s linear infinite;
-  }
 
-  /* Fish swimming decoration */
   .swimming-fish {
     position: absolute;
     font-size: 1.5rem;
@@ -741,11 +987,11 @@
     opacity: 0.4;
   }
   @keyframes swimAcross {
-    0% { transform: translateX(-100px) translateY(0px); }
-    25% { transform: translateX(25vw) translateY(-20px); }
-    50% { transform: translateX(50vw) translateY(10px); }
-    75% { transform: translateX(75vw) translateY(-15px); }
-    100% { transform: translateX(calc(100vw + 100px)) translateY(5px); }
+    0% { transform: translateX(-100px) translateY(0px) scaleX(1); }
+    25% { transform: translateX(25vw) translateY(-20px) scaleX(1); }
+    50% { transform: translateX(50vw) translateY(10px) scaleX(1); }
+    75% { transform: translateX(75vw) translateY(-15px) scaleX(1); }
+    100% { transform: translateX(calc(100vw + 100px)) translateY(5px) scaleX(1); }
   }
 
   /* ===== SCROLL PROGRESS ===== */
@@ -753,12 +999,18 @@
     position: fixed;
     top: 0; left: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--aqua), var(--moss));
+    background: linear-gradient(90deg, var(--aqua), var(--moss), var(--aqua));
+    background-size: 200% 100%;
     z-index: 1001;
     transition: width 0.1s;
+    animation: progressGradient 3s linear infinite;
+  }
+  @keyframes progressGradient {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
   }
 
-  /* Particle dots for background */
+  /* Particles */
   .particles {
     position: fixed;
     inset: 0;
@@ -775,10 +1027,10 @@
     animation: particleFade linear infinite;
   }
   @keyframes particleFade {
-    0% { opacity: 0; transform: translateY(0); }
-    20% { opacity: 0.4; }
-    80% { opacity: 0.2; }
-    100% { opacity: 0; transform: translateY(-100px); }
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    20% { opacity: 0.4; transform: translateY(-20px) scale(1); }
+    80% { opacity: 0.2; transform: translateY(-80px) scale(0.8); }
+    100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
   }
 
   .highlight {
@@ -828,10 +1080,67 @@
     filter: blur(2px);
   }
   @keyframes bubbleDrift {
-    0%   { transform: translateY(0px) translateX(0px) scale(1); }
-    33%  { transform: translateY(-18px) translateX(8px) scale(1.03); }
-    66%  { transform: translateY(-6px) translateX(-10px) scale(0.97); }
-    100% { transform: translateY(-28px) translateX(4px) scale(1.01); }
+    0%   { transform: translateY(0px) translateX(0px) scale(1) rotate(0deg); }
+    33%  { transform: translateY(-18px) translateX(8px) scale(1.03) rotate(3deg); }
+    66%  { transform: translateY(-6px) translateX(-10px) scale(0.97) rotate(-2deg); }
+    100% { transform: translateY(-28px) translateX(4px) scale(1.01) rotate(1deg); }
+  }
+
+  /* ===== CLICK RIPPLE ===== */
+  .click-ripple {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px solid var(--aqua);
+    pointer-events: none;
+    z-index: 9990;
+    animation: clickRippleExpand 0.8s ease-out forwards;
+  }
+  @keyframes clickRippleExpand {
+    0% { width: 0; height: 0; opacity: 1; }
+    100% { width: 120px; height: 120px; opacity: 0; margin-top: -60px; margin-left: -60px; }
+  }
+
+  /* ===== FIREFLY PARTICLES ===== */
+  .firefly {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px rgba(245,158,11,0.4), 0 0 20px 4px rgba(245,158,11,0.15);
+    animation: fireflyMove var(--dur) var(--delay) ease-in-out infinite alternate, fireflyGlow 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes fireflyMove {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(var(--dx1), var(--dy1)); }
+    50%  { transform: translate(var(--dx2), var(--dy2)); }
+    75%  { transform: translate(var(--dx3), var(--dy3)); }
+    100% { transform: translate(var(--dx4), var(--dy4)); }
+  }
+  @keyframes fireflyGlow {
+    0%, 100% { opacity: 0.2; box-shadow: 0 0 6px 1px rgba(245,158,11,0.3); }
+    50% { opacity: 0.9; box-shadow: 0 0 14px 4px rgba(245,158,11,0.6), 0 0 30px 8px rgba(245,158,11,0.2); }
+  }
+
+  /* ===== WAVE CANVAS ===== */
+  #waveCanvas {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 200px;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.25;
+  }
+
+  /* ===== STAGGER REVEAL ===== */
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .stagger-item.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* ===== SMOOTH SECTION TRANSITIONS ===== */
@@ -851,77 +1160,52 @@
     nav { padding: 1.2rem 1.5rem; }
     .nav-links { display: none; }
     .nav-hamburger { display: flex; }
-
     .section-inner { padding: 5rem 1.5rem; }
-
     .hero-title { font-size: clamp(2.8rem, 10vw, 5rem); }
     .hero-title span { font-size: clamp(2rem, 7vw, 3.5rem); }
-
     .factors-grid { grid-template-columns: repeat(2, 1fr) !important; }
-
-    .chain-visual {
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-    }
+    .chain-visual { flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
     .chain-arrow { padding: 0 0.25rem; font-size: 1.1rem; }
     .chain-circle { width: 85px; height: 85px; }
-
     .table-wrap { overflow-x: auto; }
     table { min-width: 500px; }
-
     .fish-grid { grid-template-columns: repeat(2, 1fr); }
-
     .meta-strip { gap: 1.5rem; }
-
-    /* Food web SVG — scale down on tablet */
     #foodweb svg { max-height: 380px; }
-
     .rating-badge { bottom: 1rem; right: 1rem; padding: 0.5rem 0.9rem; }
     .rating-num { font-size: 1.4rem; }
-
-    /* Cursor hidden on touch */
     .cursor, .cursor-ring { display: none; }
     body { cursor: auto; }
+    .morph-blob { display: none; }
+    .float-3d { display: none; }
   }
 
   @media (max-width: 600px) {
     nav { padding: 1rem 1.2rem; }
     .section-inner { padding: 4.5rem 1rem 3rem; }
     .section-title { font-size: clamp(1.8rem, 8vw, 2.5rem); }
-
     .factors-grid { grid-template-columns: 1fr !important; }
     .fish-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-
     .chain-visual { gap: 0.3rem; }
     .chain-circle { width: 72px; height: 72px; }
     .chain-emoji { font-size: 1.5rem; }
     .chain-arrow { font-size: 0.9rem; padding: 0 0.1rem; margin-bottom: 1.4rem; }
-
-    /* Food web — portrait phone gets scrollable container */
     .foodweb-scroll-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       padding-bottom: 0.5rem;
     }
     #foodweb svg { min-width: 600px; max-height: 340px; }
-
     .quote-block { padding: 2rem 1.2rem; }
     .quote-text { font-size: 1.05rem; }
-
     .hero-title { font-size: clamp(2.2rem, 11vw, 3.5rem); }
     .hero-title span { font-size: clamp(1.6rem, 8vw, 2.5rem); }
     .college-badge { font-size: 0.58rem; letter-spacing: 0.2em; }
-
     .scroll-cue { bottom: 1.5rem; }
-
     .ripple-divider { height: 70px; }
-
-    /* Rating badge smaller */
     .rating-badge { display: none; }
   }
 
-  /* Landscape phone */
   @media (max-width: 900px) and (orientation: landscape) {
     #hero { min-height: 100svh; }
     .section-inner { padding: 4rem 2rem; }
@@ -929,11 +1213,42 @@
     .chain-circle { width: 80px; height: 80px; }
   }
 
-  /* Large tablets portrait */
   @media (min-width: 601px) and (max-width: 900px) {
     .factors-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .fish-grid { grid-template-columns: repeat(3, 1fr); }
     #foodweb svg { max-height: 420px; }
+  }
+
+  /* ===== GLOW TEXT ===== */
+  .glow-text {
+    text-shadow: 0 0 10px rgba(34,211,238,0.3), 0 0 30px rgba(34,211,238,0.15);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 10px rgba(34,211,238,0.3), 0 0 30px rgba(34,211,238,0.15); }
+    50% { text-shadow: 0 0 20px rgba(34,211,238,0.5), 0 0 50px rgba(34,211,238,0.25); }
+  }
+
+  /* ===== ORBIT ANIMATION ===== */
+  .orbit-ring {
+    position: absolute;
+    border: 1px dashed rgba(34,211,238,0.08);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: orbitSpin var(--dur, 30s) linear infinite;
+  }
+  .orbit-ring .orbit-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--aqua);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--aqua);
+    top: -3px; left: 50%;
+    margin-left: -3px;
+  }
+  @keyframes orbitSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 </style>
 </head>
@@ -943,10 +1258,7 @@
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="progress-bar" id="progressBar"></div>
 
-<!-- Floating particles -->
 <div class="particles" id="particles"></div>
-
-<!-- 3D Water Bubbles Layer -->
 <div id="bubble-layer"></div>
 
 <!-- Mobile Nav Overlay -->
@@ -961,7 +1273,7 @@
 </div>
 
 <!-- NAVIGATION -->
-<nav>
+<nav id="mainNav">
   <div class="nav-logo">Pond Ecosystem Study</div>
   <ul class="nav-links">
     <li><a href="#intro">Intro</a></li>
@@ -979,10 +1291,41 @@
 <!-- HERO -->
 <section id="hero">
   <canvas class="hero-canvas" id="pondCanvas"></canvas>
-  
-  <div class="hero-content">
+  <canvas id="waveCanvas"></canvas>
+  <div class="caustics"></div>
+  <div class="caustics-2"></div>
+
+  <!-- 3D floating geometry -->
+  <div class="float-3d" style="top:12%; left:8%;">
+    <div class="shape tri-shape" style="--dur:15s;"></div>
+  </div>
+  <div class="float-3d" style="top:25%; right:12%;">
+    <div class="shape diamond-shape" style="--dur:18s;"></div>
+  </div>
+  <div class="float-3d" style="bottom:30%; left:15%;">
+    <div class="shape ring-shape" style="--dur:20s;"></div>
+  </div>
+  <div class="float-3d" style="bottom:20%; right:8%;">
+    <div class="shape cross-shape" style="--dur:16s;"></div>
+  </div>
+  <div class="float-3d" style="top:60%; left:5%;">
+    <div class="shape hex-shape" style="--dur:22s;"></div>
+  </div>
+  <div class="float-3d" style="top:15%; right:30%;">
+    <div class="shape tri-shape" style="--dur:25s; border-bottom-color: rgba(74,222,128,0.12);"></div>
+  </div>
+
+  <!-- Orbit ring -->
+  <div class="orbit-ring" style="width:600px; height:600px; top:50%; left:50%; margin-top:-300px; margin-left:-300px; --dur:40s;">
+    <div class="orbit-dot"></div>
+  </div>
+  <div class="orbit-ring" style="width:400px; height:400px; top:50%; left:50%; margin-top:-200px; margin-left:-200px; --dur:28s; animation-direction:reverse;">
+    <div class="orbit-dot" style="background:var(--moss); box-shadow:0 0 10px var(--moss);"></div>
+  </div>
+
+  <div class="hero-content" id="heroContent">
     <div class="college-badge">Karimganj College · Dept. of Ecology & Environmental Science</div>
-    <h1 class="hero-title">
+    <h1 class="hero-title glow-text">
       Study of
       <span>Pond Ecosystem</span>
     </h1>
@@ -998,6 +1341,11 @@
 <!-- INTRO -->
 <section id="intro">
   <div class="section-inner">
+    <!-- Morphing blobs -->
+    <div class="morph-blob b1"></div>
+    <div class="morph-blob b2"></div>
+    <div class="morph-blob b3"></div>
+
     <div class="reveal">
       <div class="deco-line"></div>
       <div class="section-label">Introduction</div>
@@ -1013,19 +1361,21 @@
       </p>
     </div>
 
-    <!-- Info cards -->
     <div class="factors-grid reveal" style="transition-delay: 0.4s; margin-top: 3rem; grid-template-columns: repeat(3, 1fr);">
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">⚖️</div>
         <div class="factor-name">Balance</div>
         <div class="factor-desc">A healthy pond maintains equilibrium between producers, consumers, and decomposers in a continuous cycle.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🔬</div>
         <div class="factor-name">Indicators</div>
         <div class="factor-desc">Pond species act as bioindicators — their presence or absence tells us about environmental quality.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🌊</div>
         <div class="factor-name">Cascade Effect</div>
         <div class="factor-desc">Loss of one species triggers ripple effects through the food chain, threatening the entire ecosystem.</div>
@@ -1033,12 +1383,11 @@
     </div>
   </div>
 
-  <!-- Floating bubbles decoration -->
-  <div class="float-bubble" style="width:300px;height:300px;right:-50px;top:10%;opacity:0.5;"></div>
-  <div class="float-bubble" style="width:150px;height:150px;left:5%;bottom:20%;opacity:0.3;"></div>
+  <!-- Fireflies -->
+  <div id="fireflies-intro" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;"></div>
 </section>
 
-<!-- STUDY AREA -->
+<!-- RIPPLE DIVIDER -->
 <div class="ripple-divider">
   <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,30 1440,60 L1440,120 L0,120 Z" fill="rgba(10,34,64,0.5)"/>
@@ -1059,37 +1408,51 @@
     </div>
 
     <div class="factors-grid reveal" style="transition-delay: 0.3s">
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">💧</div>
         <div class="factor-name">Water Quality</div>
         <div class="factor-desc">The quantity of water is crucial for living organisms in the pond. Only clean water can sustain life in the ecosystem.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🌡️</div>
         <div class="factor-name">Temperature</div>
         <div class="factor-desc">Extremes impact oxygen levels. Too hot — fish struggle to breathe. Too cold — ice forms, blocking sunlight and O₂.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">☀️</div>
         <div class="factor-name">Light</div>
         <div class="factor-desc">Plants need sunlight for photosynthesis, producing oxygen not just above but below the water surface for aquatic life.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🧪</div>
         <div class="factor-name">pH Level</div>
         <div class="factor-desc">Too low or too high acidity in the water can clog a fish's gills and make reproduction more challenging.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🌱</div>
         <div class="factor-name">Soil</div>
         <div class="factor-desc">The soil needs to contain enough moisture to keep surrounding plants alive. Moist, fertile soil helps plants thrive.</div>
       </div>
-      <div class="factor-card">
+      <div class="factor-card tilt-card">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">🍂</div>
         <div class="factor-name">Seasonal Change</div>
         <div class="factor-desc">Spring and fall are the seasons that keep the ecosystem healthy and minimize negative effects on organisms.</div>
       </div>
     </div>
+  </div>
+
+  <!-- Floating 3D shapes -->
+  <div class="float-3d" style="top:10%; right:5%;">
+    <div class="shape diamond-shape" style="--dur:14s;"></div>
+  </div>
+  <div class="float-3d" style="bottom:15%; left:3%;">
+    <div class="shape ring-shape" style="--dur:22s;"></div>
   </div>
 </section>
 
@@ -1105,7 +1468,6 @@
       </p>
     </div>
 
-    <!-- Food Chain -->
     <div class="reveal" style="transition-delay: 0.3s">
       <h3 style="font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--aqua); margin-top:3rem; margin-bottom:0.5rem; text-align:center;">The Pond Food Chain</h3>
       <p style="text-align:center; font-size:0.8rem; color:rgba(207,250,254,0.5); margin-bottom:0;">Energy flows through trophic levels</p>
@@ -1153,9 +1515,9 @@
       </div>
     </div>
 
-    <!-- Decomposers explanation -->
     <div class="reveal" style="transition-delay: 0.6s; margin-top: 2rem;">
-      <div class="factor-card" style="max-width:700px; margin:0 auto;">
+      <div class="factor-card tilt-card" style="max-width:700px; margin:0 auto;">
+        <div class="card-shimmer"></div>
         <div class="factor-icon">♻️</div>
         <div class="factor-name">Decomposers — Nature's Recyclers</div>
         <div class="factor-desc" style="font-size:0.9rem; line-height:1.75;">
@@ -1185,64 +1547,51 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>01</td>
-            <td>Water Thyme</td>
-            <td>Hydrilla</td>
-            <td>Submerged oxygenator</td>
-          </tr>
-          <tr>
-            <td>02</td>
-            <td>Pond Weed</td>
-            <td>Potamogeton</td>
-            <td>Habitat provider</td>
-          </tr>
-          <tr>
-            <td>03</td>
-            <td>Water Lettuce</td>
-            <td>Pistia</td>
-            <td>Floating shade cover</td>
-          </tr>
-          <tr>
-            <td>04</td>
-            <td>Spotless Watermeal</td>
-            <td>Wolffia</td>
-            <td>Micro floating plant</td>
-          </tr>
-          <tr>
-            <td>05</td>
-            <td>Duck Weed</td>
-            <td>Lemna</td>
-            <td>Surface coverage</td>
-          </tr>
+          <tr><td>01</td><td>Water Thyme</td><td>Hydrilla</td><td>Submerged oxygenator</td></tr>
+          <tr><td>02</td><td>Pond Weed</td><td>Potamogeton</td><td>Habitat provider</td></tr>
+          <tr><td>03</td><td>Water Lettuce</td><td>Pistia</td><td>Floating shade cover</td></tr>
+          <tr><td>04</td><td>Spotless Watermeal</td><td>Wolffia</td><td>Micro floating plant</td></tr>
+          <tr><td>05</td><td>Duck Weed</td><td>Lemna</td><td>Surface coverage</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Visual plant illustrations -->
     <div class="factors-grid reveal" style="transition-delay:0.5s; margin-top:2.5rem; grid-template-columns:repeat(5,1fr);">
-      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
-        <div style="font-size:3rem;">🌿</div>
+      <div class="factor-card tilt-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div class="card-shimmer"></div>
+        <div style="font-size:3rem; animation: iconFloat 3s ease-in-out infinite;">🌿</div>
         <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Hydrilla</div>
       </div>
-      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
-        <div style="font-size:3rem;">🪴</div>
+      <div class="factor-card tilt-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div class="card-shimmer"></div>
+        <div style="font-size:3rem; animation: iconFloat 3.5s ease-in-out infinite 0.3s;">🪴</div>
         <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Potamogeton</div>
       </div>
-      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
-        <div style="font-size:3rem;">🥬</div>
+      <div class="factor-card tilt-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div class="card-shimmer"></div>
+        <div style="font-size:3rem; animation: iconFloat 4s ease-in-out infinite 0.6s;">🥬</div>
         <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Pistia</div>
       </div>
-      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
-        <div style="font-size:3rem;">🌱</div>
+      <div class="factor-card tilt-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div class="card-shimmer"></div>
+        <div style="font-size:3rem; animation: iconFloat 3.2s ease-in-out infinite 0.9s;">🌱</div>
         <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Wolffia</div>
       </div>
-      <div class="factor-card" style="text-align:center; padding:1.5rem 1rem;">
-        <div style="font-size:3rem;">🍃</div>
+      <div class="factor-card tilt-card" style="text-align:center; padding:1.5rem 1rem;">
+        <div class="card-shimmer"></div>
+        <div style="font-size:3rem; animation: iconFloat 3.8s ease-in-out infinite 1.2s;">🍃</div>
         <div style="font-size:0.8rem; margin-top:0.5rem; color:var(--moss);">Lemna</div>
       </div>
     </div>
   </div>
+
+  <style>
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(3deg); }
+      75% { transform: translateY(4px) rotate(-2deg); }
+    }
+  </style>
 </section>
 
 <!-- FISH SPECIES -->
@@ -1256,85 +1605,26 @@
     </div>
 
     <div class="fish-grid reveal" style="transition-delay:0.3s">
-      <div class="fish-card">
-        <div class="fish-common">Chital</div>
-        <div class="fish-sci">Notopterus chitala (Hamilton)</div>
-        <span class="fish-status">C, PF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Catla</div>
-        <div class="fish-sci">Catla catla (Hammitton)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Mrigal</div>
-        <div class="fish-sci">Cirrhinus mrigala (Hammitton)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Common Carp</div>
-        <div class="fish-sci">Cyprinus carpio (Linnaeus)</div>
-        <span class="fish-status en">En, PF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Stone Sucker</div>
-        <div class="fish-sci">Garra lamta (Hamilton)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Khavli Barb</div>
-        <div class="fish-sci">Putins dicto (Hamilton)</div>
-        <span class="fish-status">C, WF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Baal</div>
-        <div class="fish-sci">Wallago attu (Schneider)</div>
-        <span class="fish-status">C, PF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Magun</div>
-        <div class="fish-sci">Clarias batrachus (Linnaeus)</div>
-        <span class="fish-status en">EN, PF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Stinging Catfish</div>
-        <div class="fish-sci">Heteropneustes fossilis (Bloch)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Indian Glass Fish</div>
-        <div class="fish-sci">Chanda nanga (Hamilton)</div>
-        <span class="fish-status">C, WF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Spiny Eel</div>
-        <div class="fish-sci">Mastacembelus armatus (Lacepede)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Spotted Snakehead</div>
-        <div class="fish-sci">Ophiocephalus punctatus (Bloch)</div>
-        <span class="fish-status">C, PF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Climbing Perch</div>
-        <div class="fish-sci">Anabus testudineus (Bloch)</div>
-        <span class="fish-status">C, WF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Bar-eyed Goby</div>
-        <div class="fish-sci">Glossogobius giuris (Hamilton)</div>
-        <span class="fish-status u">U, FF</span>
-      </div>
-      <div class="fish-card">
-        <div class="fish-common">Mottled Nandus</div>
-        <div class="fish-sci">Nandus nandus (Hamilton)</div>
-        <span class="fish-status">C, FF</span>
-      </div>
+      <div class="fish-card tilt-card"><div class="fish-common">Chital</div><div class="fish-sci">Notopterus chitala (Hamilton)</div><span class="fish-status">C, PF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Catla</div><div class="fish-sci">Catla catla (Hammitton)</div><span class="fish-status">C, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Mrigal</div><div class="fish-sci">Cirrhinus mrigala (Hammitton)</div><span class="fish-status">C, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Common Carp</div><div class="fish-sci">Cyprinus carpio (Linnaeus)</div><span class="fish-status en">En, PF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Stone Sucker</div><div class="fish-sci">Garra lamta (Hamilton)</div><span class="fish-status">C, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Khavli Barb</div><div class="fish-sci">Putins dicto (Hamilton)</div><span class="fish-status">C, WF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Baal</div><div class="fish-sci">Wallago attu (Schneider)</div><span class="fish-status">C, PF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Magun</div><div class="fish-sci">Clarias batrachus (Linnaeus)</div><span class="fish-status en">EN, PF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Stinging Catfish</div><div class="fish-sci">Heteropneustes fossilis (Bloch)</div><span class="fish-status">C, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Indian Glass Fish</div><div class="fish-sci">Chanda nanga (Hamilton)</div><span class="fish-status">C, WF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Spiny Eel</div><div class="fish-sci">Mastacembelus armatus (Lacepede)</div><span class="fish-status">C, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Spotted Snakehead</div><div class="fish-sci">Ophiocephalus punctatus (Bloch)</div><span class="fish-status">C, PF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Climbing Perch</div><div class="fish-sci">Anabus testudineus (Bloch)</div><span class="fish-status">C, WF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Bar-eyed Goby</div><div class="fish-sci">Glossogobius giuris (Hamilton)</div><span class="fish-status u">U, FF</span></div>
+      <div class="fish-card tilt-card"><div class="fish-common">Mottled Nandus</div><div class="fish-sci">Nandus nandus (Hamilton)</div><span class="fish-status">C, FF</span></div>
     </div>
   </div>
   <div class="swimming-fish" style="top:30%; animation-delay: -5s;">🐟</div>
   <div class="swimming-fish" style="top:60%; font-size:1rem; animation-delay:-12s; animation-duration:25s;">🐠</div>
+  <div class="swimming-fish" style="top:75%; font-size:0.8rem; animation-delay:-18s; animation-duration:30s;">🐡</div>
 </section>
 
 <!-- FOOD WEB -->
@@ -1347,19 +1637,20 @@
       <p class="section-body">The decomposer food web illustrates how energy and nutrients cycle through the microscopic community of the pond — a hidden world that keeps the entire ecosystem functioning.</p>
     </div>
 
-    <!-- Interactive SVG food web - hand-drawn style arrows -->
-    <div class="reveal foodweb-scroll-wrap" style="transition-delay:0.3s; margin-top:3rem;">
+    <div class="reveal foodweb-scroll-wrap" style="transition-delay:0.3s; margin-top:3rem;" id="foodwebContainer">
       <svg viewBox="0 0 800 480" width="100%" style="max-height:480px; font-family:'Caveat',cursive;" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <!-- Hand-drawn style arrowhead -->
           <marker id="arrow-hd" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
             <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(34,211,238,0.7)" stroke="none"/>
           </marker>
           <marker id="arrow-hd-dashed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
             <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(34,211,238,0.35)" stroke="none"/>
           </marker>
-          <marker id="arrow-hd-green" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
-            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(74,222,128,0.7)" stroke="none"/>
+          <marker id="arrow-hd-gold" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(245,158,11,0.7)" stroke="none"/>
+          </marker>
+          <marker id="arrow-hd-purple" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0.5 C2,1 6,2.5 9,4 C6,5.5 2,7 0,7.5 C1.5,6.5 2.5,5 2,4 C2.5,3 1.5,1.5 0,0.5 Z" fill="rgba(168,85,247,0.7)" stroke="none"/>
           </marker>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -1371,60 +1662,82 @@
           </filter>
         </defs>
 
-        <!-- Hand-drawn arrows (slightly wobbly paths matching hand-drawn diagram) -->
-        <!-- Phytoplankton → Bacteria -->
-        <path d="M212,178 C270,190 320,205 345,225" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
-        <!-- Phytoplankton → Detritus -->
-        <path d="M210,162 C320,145 450,130 558,112" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
-        <!-- Bacteria → Detritus -->
-        <path d="M450,220 C490,185 525,155 560,118" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
-        <!-- Bacteria → DOC (Dissolved Organic Carbon) -->
-        <path d="M360,260 C310,295 265,340 220,368" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
-        <!-- Bacteria → Virus -->
-        <path d="M400,290 C400,320 400,350 400,353" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
-        <!-- Protozoa → Zooplankton -->
-        <path d="M660,376 C660,360 660,345 660,342" fill="none" stroke="rgba(168,85,247,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-green)"/>
-        <!-- Zooplankton → Detritus (dashed) -->
-        <path d="M638,265 C625,220 615,175 612,158" fill="none" stroke="rgba(34,211,238,0.4)" stroke-width="1.8" stroke-dasharray="5,4" stroke-linecap="round" marker-end="url(#arrow-hd-dashed)"/>
-        <!-- Bacteria → Zooplankton -->
-        <path d="M454,238 C520,250 570,262 608,272" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" filter="url(#sketchy)" marker-end="url(#arrow-hd)"/>
+        <!-- Animated paths with draw effect -->
+        <path class="web-path-draw" id="wp1" d="M212,178 C270,190 320,205 345,225" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd)"/>
+        <path class="web-path-draw" id="wp2" d="M210,162 C320,145 450,130 558,112" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd)"/>
+        <path class="web-path-draw" id="wp3" d="M450,220 C490,185 525,155 560,118" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd)"/>
+        <path class="web-path-draw" id="wp4" d="M360,260 C310,295 265,340 220,368" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd-gold)"/>
+        <path class="web-path-draw" id="wp5" d="M400,290 C400,320 400,350 400,353" fill="none" stroke="rgba(245,158,11,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd-gold)"/>
+        <path class="web-path-draw" id="wp6" d="M660,376 C660,360 660,345 660,342" fill="none" stroke="rgba(168,85,247,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd-purple)"/>
+        <path class="web-path-draw" id="wp7" d="M638,265 C625,220 615,175 612,158" fill="none" stroke="rgba(34,211,238,0.4)" stroke-width="1.8" stroke-dasharray="5,4" stroke-linecap="round" marker-end="url(#arrow-hd-dashed)"/>
+        <path class="web-path-draw" id="wp8" d="M454,238 C520,250 570,262 608,272" fill="none" stroke="rgba(34,211,238,0.6)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrow-hd)"/>
+
+        <!-- Flowing energy dots along paths -->
+        <circle r="3" fill="#22d3ee" opacity="0.8" filter="url(#glow)">
+          <animateMotion dur="3s" repeatCount="indefinite" path="M212,178 C270,190 320,205 345,225"/>
+        </circle>
+        <circle r="3" fill="#22d3ee" opacity="0.8" filter="url(#glow)">
+          <animateMotion dur="4s" repeatCount="indefinite" path="M210,162 C320,145 450,130 558,112" begin="1s"/>
+        </circle>
+        <circle r="2.5" fill="#f59e0b" opacity="0.7" filter="url(#glow)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" path="M360,260 C310,295 265,340 220,368" begin="0.5s"/>
+        </circle>
+        <circle r="2.5" fill="#f59e0b" opacity="0.7" filter="url(#glow)">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M400,290 C400,320 400,350 400,353"/>
+        </circle>
+        <circle r="2.5" fill="#c084fc" opacity="0.7" filter="url(#glow)">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M660,376 C660,360 660,345 660,342"/>
+        </circle>
+        <circle r="3" fill="#22d3ee" opacity="0.8" filter="url(#glow)">
+          <animateMotion dur="3s" repeatCount="indefinite" path="M454,238 C520,250 570,262 608,272" begin="2s"/>
+        </circle>
+        <circle r="2" fill="#22d3ee" opacity="0.5">
+          <animateMotion dur="4s" repeatCount="indefinite" path="M638,265 C625,220 615,175 612,158" begin="1.5s"/>
+        </circle>
 
         <!-- Nodes -->
-        <!-- Phytoplankton -->
-        <circle cx="160" cy="170" r="52" fill="rgba(22,163,74,0.2)" stroke="#4ade80" stroke-width="1.8" filter="url(#glow)"/>
+        <circle cx="160" cy="170" r="52" fill="rgba(22,163,74,0.2)" stroke="#4ade80" stroke-width="1.8" filter="url(#glow)">
+          <animate attributeName="r" values="52;55;52" dur="4s" repeatCount="indefinite"/>
+        </circle>
         <text x="160" y="163" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600" letter-spacing="0.5">PHYTO</text>
         <text x="160" y="178" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600">PLANKTON</text>
         <text x="160" y="195" text-anchor="middle" fill="rgba(74,222,128,0.5)" font-size="9">🌿</text>
 
-        <!-- Bacteria -->
-        <circle cx="400" cy="235" r="55" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.8" filter="url(#glow)"/>
+        <circle cx="400" cy="235" r="55" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.8" filter="url(#glow)">
+          <animate attributeName="r" values="55;58;55" dur="3.5s" repeatCount="indefinite"/>
+        </circle>
         <text x="400" y="230" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600" letter-spacing="0.5">BACTERIA</text>
         <text x="400" y="248" text-anchor="middle" fill="rgba(245,158,11,0.5)" font-size="12">🦠</text>
 
-        <!-- Detritus -->
-        <circle cx="610" cy="110" r="50" fill="rgba(212,165,116,0.2)" stroke="#d4a574" stroke-width="1.8"/>
+        <circle cx="610" cy="110" r="50" fill="rgba(212,165,116,0.2)" stroke="#d4a574" stroke-width="1.8">
+          <animate attributeName="r" values="50;53;50" dur="5s" repeatCount="indefinite"/>
+        </circle>
         <text x="610" y="105" text-anchor="middle" fill="#d4a574" font-size="10" font-weight="600">DETRITUS</text>
         <text x="610" y="122" text-anchor="middle" fill="rgba(212,165,116,0.5)" font-size="11">🍂</text>
 
-        <!-- Virus -->
-        <circle cx="400" cy="395" r="42" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="1.8"/>
+        <circle cx="400" cy="395" r="42" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="1.8">
+          <animate attributeName="r" values="42;45;42" dur="3s" repeatCount="indefinite"/>
+        </circle>
         <text x="400" y="390" text-anchor="middle" fill="#f87171" font-size="10" font-weight="600">VIRUS</text>
         <text x="400" y="408" text-anchor="middle" fill="rgba(239,68,68,0.5)" font-size="10">⚗️</text>
 
-        <!-- DOC -->
-        <circle cx="170" cy="385" r="48" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.8"/>
+        <circle cx="170" cy="385" r="48" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.3)" stroke-width="1.8">
+          <animate attributeName="r" values="48;51;48" dur="4.5s" repeatCount="indefinite"/>
+        </circle>
         <text x="170" y="375" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">DISSOLVED</text>
         <text x="170" y="390" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">ORGANIC</text>
         <text x="170" y="405" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="9" font-weight="600">CARBON</text>
 
-        <!-- Zooplankton -->
-        <circle cx="660" cy="290" r="50" fill="rgba(14,116,144,0.2)" stroke="#22d3ee" stroke-width="1.8" filter="url(#glow)"/>
+        <circle cx="660" cy="290" r="50" fill="rgba(14,116,144,0.2)" stroke="#22d3ee" stroke-width="1.8" filter="url(#glow)">
+          <animate attributeName="r" values="50;53;50" dur="3.8s" repeatCount="indefinite"/>
+        </circle>
         <text x="660" y="283" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600" letter-spacing="0.5">ZOO</text>
         <text x="660" y="297" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600">PLANKTON</text>
         <text x="660" y="313" text-anchor="middle" fill="rgba(34,211,238,0.5)" font-size="11">🦐</text>
 
-        <!-- Protozoa -->
-        <circle cx="660" cy="420" r="44" fill="rgba(168,85,247,0.2)" stroke="#c084fc" stroke-width="1.8"/>
+        <circle cx="660" cy="420" r="44" fill="rgba(168,85,247,0.2)" stroke="#c084fc" stroke-width="1.8">
+          <animate attributeName="r" values="44;47;44" dur="4.2s" repeatCount="indefinite"/>
+        </circle>
         <text x="660" y="415" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">PROTOZOA</text>
         <text x="660" y="432" text-anchor="middle" fill="rgba(192,132,252,0.5)" font-size="10">🔬</text>
       </svg>
@@ -1435,6 +1748,10 @@
 <!-- CONCLUSION -->
 <section id="conclusion">
   <div class="section-inner">
+    <!-- Morph blob -->
+    <div class="morph-blob b1" style="left:-200px; top:0;"></div>
+    <div class="morph-blob b2" style="right:-150px; bottom:-100px;"></div>
+
     <div class="reveal">
       <div class="deco-line" style="margin:0 auto 1rem;"></div>
       <div class="section-label">Conclusion</div>
@@ -1474,22 +1791,25 @@
       </div>
     </div>
 
-    <!-- Key stats -->
     <div class="factors-grid reveal" style="transition-delay:0.7s; margin-top:3rem; grid-template-columns:repeat(4,1fr);">
-      <div class="factor-card" style="text-align:center;">
-        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--aqua); font-weight:900;">5</div>
+      <div class="factor-card tilt-card" style="text-align:center;">
+        <div class="card-shimmer"></div>
+        <div class="counter-num" data-target="5">0</div>
         <div class="factor-name" style="font-size:0.85rem;">Aquatic Producers</div>
       </div>
-      <div class="factor-card" style="text-align:center;">
-        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--moss); font-weight:900;">15</div>
+      <div class="factor-card tilt-card" style="text-align:center;">
+        <div class="card-shimmer"></div>
+        <div class="counter-num" data-target="15" style="color:var(--moss);">0</div>
         <div class="factor-name" style="font-size:0.85rem;">Fish Species</div>
       </div>
-      <div class="factor-card" style="text-align:center;">
-        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--gold); font-weight:900;">3</div>
+      <div class="factor-card tilt-card" style="text-align:center;">
+        <div class="card-shimmer"></div>
+        <div class="counter-num" data-target="3" style="color:var(--gold);">0</div>
         <div class="factor-name" style="font-size:0.85rem;">Consumer Levels</div>
       </div>
-      <div class="factor-card" style="text-align:center;">
-        <div style="font-family:'Playfair Display',serif; font-size:3rem; color:var(--sand); font-weight:900;">6</div>
+      <div class="factor-card tilt-card" style="text-align:center;">
+        <div class="card-shimmer"></div>
+        <div class="counter-num" data-target="6" style="color:var(--sand);">0</div>
         <div class="factor-name" style="font-size:0.85rem;">Abiotic Factors</div>
       </div>
     </div>
@@ -1538,7 +1858,7 @@ function closeMobileNav() {
   setTimeout(() => { nav.style.display = 'none'; }, 400);
 }
 
-// ===== CURSOR (desktop only) =====
+// ===== CURSOR =====
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
@@ -1559,10 +1879,36 @@ if (window.matchMedia('(pointer:fine)').matches) {
   animateCursor();
 }
 
+// ===== CLICK RIPPLE =====
+document.addEventListener('click', e => {
+  const ripple = document.createElement('div');
+  ripple.className = 'click-ripple';
+  ripple.style.left = e.clientX + 'px';
+  ripple.style.top = e.clientY + 'px';
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 800);
+});
+
 // ===== PROGRESS BAR =====
 window.addEventListener('scroll', () => {
   const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
   document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// ===== NAV SCROLL STATE =====
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 80);
+}, { passive: true });
+
+// ===== HERO PARALLAX =====
+const heroContent = document.getElementById('heroContent');
+document.addEventListener('mousemove', e => {
+  if (!heroContent) return;
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const dx = (e.clientX - cx) / cx;
+  const dy = (e.clientY - cy) / cy;
+  heroContent.style.transform = `translate(${dx * 8}px, ${dy * 6}px)`;
 });
 
 // ===== CANVAS POND =====
@@ -1602,10 +1948,12 @@ class Fish {
     this.speed = Math.random() * 1.2 + 0.4;
     this.size = Math.random() * 12 + 6;
     this.color = `rgba(${Math.floor(Math.random()*100+100)},${Math.floor(Math.random()*100+150)},${Math.floor(Math.random()*50+200)},0.6)`;
+    this.wobble = Math.random() * 0.02 + 0.005;
+    this.wobbleAmp = Math.random() * 0.8 + 0.3;
   }
   update() {
     this.x += this.speed;
-    this.y += Math.sin(this.x * 0.01) * 0.5;
+    this.y += Math.sin(this.x * this.wobble) * this.wobbleAmp;
     if (this.x > canvas.width + 50) this.reset();
   }
   draw() {
@@ -1625,16 +1973,141 @@ class Fish {
     ctx.restore();
   }
 }
-
-for (let i = 0; i < 8; i++) {
+for (let i = 0; i < 10; i++) {
   const f = new Fish();
   f.x = Math.random() * canvas.width;
   fishArr.push(f);
 }
 
+// Lily pads
+const lilyPads = [];
+class LilyPad {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height * (0.5 + Math.random() * 0.35);
+    this.r = 20 + Math.random() * 25;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.002;
+    this.drift = (Math.random() - 0.5) * 0.15;
+    this.hasFlower = Math.random() > 0.6;
+    this.bobPhase = Math.random() * Math.PI * 2;
+    this.bobSpeed = 0.01 + Math.random() * 0.01;
+  }
+  update(t) {
+    this.rotation += this.rotSpeed;
+    this.x += this.drift;
+    this.y += Math.sin(t * this.bobSpeed + this.bobPhase) * 0.2;
+    if (this.x > canvas.width + 60) this.x = -60;
+    if (this.x < -60) this.x = canvas.width + 60;
+  }
+  draw(t) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    // Pad
+    ctx.beginPath();
+    ctx.arc(0, 0, this.r, 0.15, Math.PI * 2 - 0.15);
+    ctx.lineTo(0, 0);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(22,163,74,0.25)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(74,222,128,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Veins
+    for (let a = 0.5; a < Math.PI * 2 - 0.3; a += 0.7) {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a) * this.r * 0.85, Math.sin(a) * this.r * 0.85);
+      ctx.strokeStyle = 'rgba(74,222,128,0.12)';
+      ctx.stroke();
+    }
+    // Flower
+    if (this.hasFlower) {
+      const fx = this.r * 0.3, fy = -this.r * 0.3;
+      for (let p = 0; p < 5; p++) {
+        const pa = (p / 5) * Math.PI * 2 + t * 0.005;
+        ctx.beginPath();
+        ctx.ellipse(fx + Math.cos(pa) * 6, fy + Math.sin(pa) * 6, 5, 3, pa, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245,158,11,0.3)';
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(fx, fy, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245,158,11,0.5)';
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+for (let i = 0; i < 5; i++) lilyPads.push(new LilyPad());
+
+// Dragonflies
+const dragonflies = [];
+class Dragonfly {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height * (0.2 + Math.random() * 0.3);
+    this.speed = 1 + Math.random() * 1.5;
+    this.wingPhase = Math.random() * Math.PI * 2;
+    this.dy = 0;
+    this.targetY = this.y;
+  }
+  update(t) {
+    this.x += this.speed;
+    this.wingPhase += 0.4;
+    if (Math.random() < 0.01) this.targetY = canvas.height * (0.15 + Math.random() * 0.35);
+    this.dy += (this.targetY - this.y) * 0.02;
+    this.y += this.dy;
+    if (this.x > canvas.width + 30) {
+      this.x = -30;
+      this.y = canvas.height * (0.2 + Math.random() * 0.3);
+    }
+  }
+  draw(t) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(34,211,238,0.35)';
+    ctx.fill();
+    // Wings
+    const wingAngle = Math.sin(this.wingPhase) * 0.4;
+    ctx.beginPath();
+    ctx.ellipse(-2, -3 + wingAngle * 5, 7, 2.5, -0.3 + wingAngle, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(207,250,254,0.15)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(-2, 3 - wingAngle * 5, 7, 2.5, 0.3 - wingAngle, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(207,250,254,0.15)';
+    ctx.fill();
+    ctx.restore();
+  }
+}
+for (let i = 0; i < 3; i++) dragonflies.push(new Dragonfly());
+
 const stars = [];
-for (let i = 0; i < 80; i++) {
+for (let i = 0; i < 100; i++) {
   stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.5, opacity: Math.random() * 0.5 + 0.1, twinkle: Math.random() * 0.02 });
+}
+
+// Caustic light pattern on canvas
+function drawCaustics(t) {
+  ctx.save();
+  ctx.globalAlpha = 0.025;
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 6; i++) {
+    const cx = canvas.width * (0.2 + 0.6 * Math.sin(t * 0.3 + i * 1.2));
+    const cy = canvas.height * (0.3 + 0.4 * Math.cos(t * 0.25 + i * 0.8));
+    const rx = 60 + 30 * Math.sin(t * 0.5 + i);
+    const ry = 40 + 20 * Math.cos(t * 0.4 + i);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, t * 0.1 + i, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(34,211,238,1)';
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 let t = 0;
@@ -1646,6 +2119,8 @@ function drawPond() {
   grad.addColorStop(1, '#0a2240');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Stars
   stars.forEach(s => {
     s.opacity += (Math.random() - 0.5) * s.twinkle;
     s.opacity = Math.max(0.05, Math.min(0.6, s.opacity));
@@ -1654,6 +2129,11 @@ function drawPond() {
     ctx.fillStyle = `rgba(207,250,254,${s.opacity})`;
     ctx.fill();
   });
+
+  // Caustic lights
+  drawCaustics(t);
+
+  // Waves
   for (let w = 0; w < 5; w++) {
     ctx.beginPath();
     const waveY = canvas.height * 0.4 + w * 60;
@@ -1665,6 +2145,8 @@ function drawPond() {
     ctx.strokeStyle = `rgba(34,211,238,${0.04 - w * 0.006})`;
     ctx.lineWidth = 1; ctx.stroke();
   }
+
+  // Underwater plant shapes
   [[0.15, 0.65], [0.7, 0.75], [0.45, 0.85], [0.85, 0.6]].forEach(([px, py]) => {
     const x = px * canvas.width, y = py * canvas.height;
     ctx.beginPath();
@@ -1672,13 +2154,26 @@ function drawPond() {
     ctx.fillStyle = 'rgba(22,163,74,0.15)'; ctx.fill();
     ctx.strokeStyle = 'rgba(74,222,128,0.2)'; ctx.lineWidth = 1; ctx.stroke();
   });
+
+  // Lily pads
+  lilyPads.forEach(lp => { lp.update(t); lp.draw(t); });
+
+  // Dragonflies
+  dragonflies.forEach(df => { df.update(t); df.draw(t); });
+
+  // Ripples
   ripples.forEach((r, i) => { r.update(); r.draw(); if (r.opacity <= 0) ripples.splice(i, 1); });
+
+  // Fish
   fishArr.forEach(f => { f.update(); f.draw(); });
+
+  // Center glow
   const radGrad = ctx.createRadialGradient(canvas.width*0.5, canvas.height*0.5, 0, canvas.width*0.5, canvas.height*0.5, canvas.width*0.4);
   radGrad.addColorStop(0, 'rgba(34,211,238,0.04)');
   radGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = radGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
   t += 0.015;
   requestAnimationFrame(drawPond);
 }
@@ -1689,6 +2184,37 @@ canvas.addEventListener('click', e => {
   for (let i = 0; i < 3; i++) setTimeout(() => ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top)), i * 150);
 });
 
+// ===== WAVE CANVAS =====
+const waveCanvas = document.getElementById('waveCanvas');
+const wctx = waveCanvas.getContext('2d');
+function resizeWaveCanvas() {
+  waveCanvas.width = waveCanvas.offsetWidth;
+  waveCanvas.height = waveCanvas.offsetHeight;
+}
+resizeWaveCanvas();
+window.addEventListener('resize', resizeWaveCanvas);
+
+let wt = 0;
+function drawWaves() {
+  wctx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+  for (let layer = 0; layer < 3; layer++) {
+    wctx.beginPath();
+    const baseY = waveCanvas.height * (0.3 + layer * 0.2);
+    wctx.moveTo(0, waveCanvas.height);
+    for (let x = 0; x <= waveCanvas.width; x += 3) {
+      const y = baseY + Math.sin(x * 0.01 + wt * (0.8 + layer * 0.3) + layer * 2) * 8 + Math.sin(x * 0.005 + wt * 0.4) * 4;
+      wctx.lineTo(x, y);
+    }
+    wctx.lineTo(waveCanvas.width, waveCanvas.height);
+    wctx.closePath();
+    wctx.fillStyle = `rgba(34,211,238,${0.03 - layer * 0.008})`;
+    wctx.fill();
+  }
+  wt += 0.02;
+  requestAnimationFrame(drawWaves);
+}
+drawWaves();
+
 // ===== SCROLL REVEAL =====
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
@@ -1696,26 +2222,22 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 reveals.forEach(el => observer.observe(el));
 
-// ===== SMOOTH SECTION TRANSITIONS =====
+// ===== SECTION TRANSITIONS =====
 const sections = document.querySelectorAll('section');
 const secObserver = new IntersectionObserver((entries) => {
   entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('in-view');
-    }
+    if (e.isIntersecting) e.target.classList.add('in-view');
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
 sections.forEach(sec => {
   sec.classList.add('section-transition');
-  // Hero starts visible immediately
   if (sec.id === 'hero') sec.classList.add('in-view');
   else secObserver.observe(sec);
 });
 
 // ===== PARTICLES =====
 const pContainer = document.getElementById('particles');
-for (let i = 0; i < 30; i++) {
+for (let i = 0; i < 35; i++) {
   const p = document.createElement('div');
   p.className = 'particle';
   p.style.left = Math.random() * 100 + 'vw';
@@ -1726,19 +2248,43 @@ for (let i = 0; i < 30; i++) {
   pContainer.appendChild(p);
 }
 
-// ===== 3D WATER BUBBLES (scroll-parallax) =====
+// ===== FIREFLIES =====
+function createFireflies(containerId, count) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  for (let i = 0; i < count; i++) {
+    const ff = document.createElement('div');
+    ff.className = 'firefly';
+    ff.style.left = Math.random() * 100 + '%';
+    ff.style.top = Math.random() * 100 + '%';
+    ff.style.setProperty('--dur', (8 + Math.random() * 12) + 's');
+    ff.style.setProperty('--delay', (Math.random() * -10) + 's');
+    ff.style.setProperty('--dx1', (Math.random() * 100 - 50) + 'px');
+    ff.style.setProperty('--dy1', (Math.random() * 80 - 40) + 'px');
+    ff.style.setProperty('--dx2', (Math.random() * 120 - 60) + 'px');
+    ff.style.setProperty('--dy2', (Math.random() * 80 - 40) + 'px');
+    ff.style.setProperty('--dx3', (Math.random() * 80 - 40) + 'px');
+    ff.style.setProperty('--dy3', (Math.random() * 100 - 50) + 'px');
+    ff.style.setProperty('--dx4', (Math.random() * 60 - 30) + 'px');
+    ff.style.setProperty('--dy4', (Math.random() * 60 - 30) + 'px');
+    container.appendChild(ff);
+  }
+}
+createFireflies('fireflies-intro', 15);
+
+// ===== 3D WATER BUBBLES (scroll parallax) =====
 (function() {
   const layer = document.getElementById('bubble-layer');
   const bubbleData = [];
-  const COUNT = window.innerWidth < 600 ? 14 : 22;
+  const COUNT = window.innerWidth < 600 ? 14 : 24;
 
   for (let i = 0; i < COUNT; i++) {
     const size = 18 + Math.random() * 55;
     const dur = 4 + Math.random() * 7;
     const delay = -(Math.random() * 10);
-    const startX = Math.random() * 100;  // vw
-    const startY = 10 + Math.random() * 80; // vh base
-    const speed = 0.04 + Math.random() * 0.12; // parallax speed
+    const startX = Math.random() * 100;
+    const startY = 10 + Math.random() * 80;
+    const speed = 0.04 + Math.random() * 0.12;
     const phase = Math.random() * Math.PI * 2;
 
     const el = document.createElement('div');
@@ -1749,42 +2295,141 @@ for (let i = 0; i < 30; i++) {
     el.style.height = size + 'px';
     el.style.left = startX + 'vw';
     el.style.opacity = 0.35 + Math.random() * 0.45;
-
     layer.appendChild(el);
     bubbleData.push({ el, startY, speed, phase, size });
   }
 
-  let lastScroll = 0;
   let ticking = false;
-
   function updateBubbles(scrollY) {
-    bubbleData.forEach((b, i) => {
-      // Parallax: each bubble moves at its own speed relative to scroll
+    bubbleData.forEach((b) => {
       const offsetY = scrollY * b.speed;
-      // Slight horizontal sway based on scroll momentum
       const swayX = Math.sin(scrollY * 0.002 + b.phase) * 12;
-      // 3D-ish scale shift based on scroll position
       const scrollFraction = (scrollY / (document.body.scrollHeight - window.innerHeight));
       const scaleZ = 0.85 + Math.sin(scrollFraction * Math.PI * 2 + b.phase) * 0.18;
-
       b.el.style.top = `calc(${b.startY}vh - ${offsetY * 0.6}px)`;
       b.el.style.transform = `translateX(${swayX}px) scale(${scaleZ})`;
     });
   }
-
   window.addEventListener('scroll', () => {
-    lastScroll = window.scrollY;
     if (!ticking) {
       requestAnimationFrame(() => {
-        updateBubbles(lastScroll);
+        updateBubbles(window.scrollY);
         ticking = false;
       });
       ticking = true;
     }
   }, { passive: true });
-
   updateBubbles(0);
 })();
+
+// ===== 3D CARD TILT =====
+(function() {
+  if (!window.matchMedia('(pointer:fine)').matches) return;
+  const cards = document.querySelectorAll('.tilt-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rotateX = ((y - cy) / cy) * -8;
+      const rotateY = ((x - cx) / cx) * 8;
+      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateY(0)';
+      card.style.transition = 'transform 0.5s ease';
+    });
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.1s ease';
+    });
+  });
+})();
+
+// ===== ANIMATED COUNTERS =====
+(function() {
+  const counters = document.querySelectorAll('.counter-num');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.target);
+        let current = 0;
+        const increment = target / 40;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = Math.floor(current);
+        }, 40);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => counterObserver.observe(c));
+})();
+
+// ===== SVG PATH DRAW ANIMATION =====
+(function() {
+  const paths = document.querySelectorAll('.web-path-draw');
+  // Calculate actual path lengths
+  const foodwebContainer = document.getElementById('foodwebContainer');
+  if (!foodwebContainer) return;
+
+  const fwObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        paths.forEach((path, i) => {
+          const length = path.getTotalLength();
+          path.style.strokeDasharray = length;
+          path.style.strokeDashoffset = length;
+          setTimeout(() => {
+            path.style.transition = `stroke-dashoffset 1.5s ease ${i * 0.2}s`;
+            path.style.strokeDashoffset = '0';
+          }, 100);
+        });
+        fwObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  fwObserver.observe(foodwebContainer);
+})();
+
+// ===== STAGGERED CARD ENTRANCE =====
+(function() {
+  const grids = document.querySelectorAll('.factors-grid, .fish-grid');
+  grids.forEach(grid => {
+    const items = grid.querySelectorAll('.factor-card, .fish-card');
+    items.forEach((item, i) => {
+      item.classList.add('stagger-item');
+      item.style.transitionDelay = `${i * 0.08}s`;
+    });
+  });
+
+  const staggerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const items = entry.target.querySelectorAll('.stagger-item');
+        items.forEach(item => item.classList.add('visible'));
+        staggerObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  grids.forEach(grid => staggerObserver.observe(grid));
+})();
+
+// ===== SMOOTH SCROLL FOR NAV LINKS =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 </script>
 </body>
-</html>
+          </html>
